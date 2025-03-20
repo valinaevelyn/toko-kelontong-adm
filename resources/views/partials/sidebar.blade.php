@@ -2,7 +2,7 @@
     <div class="offcanvas-md offcanvas-end bg-body-tertiary" tabindex="-1" id="sidebarMenu"
         aria-labelledby="sidebarMenuLabel">
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="sidebarMenuLabel">Toko Kelontong</h5>
+            <h5 class="offcanvas-title" id="sidebarMenuLabel">AS MART</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu"
                 aria-label="Close"></button>
         </div>
@@ -25,11 +25,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2" href="#">
+                    <a class="nav-link d-flex align-items-center gap-2" href="/item">
                         <svg class="bi">
                             <use xlink:href="#cart" />
                         </svg>
-                        Products
+                        Item
                     </a>
                 </li>
                 <li class="nav-item">
@@ -48,14 +48,7 @@
                         Reports
                     </a>
                 </li>
-                {{-- <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2" href="#">
-                        <svg class="bi">
-                            <use xlink:href="#puzzle" />
-                        </svg>
-                        Integrations
-                    </a>
-                </li> --}}
+
             </ul>
 
             {{-- <h6
