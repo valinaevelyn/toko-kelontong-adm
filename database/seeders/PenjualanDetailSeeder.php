@@ -21,7 +21,6 @@ class PenjualanDetailSeeder extends Seeder
                     'penjualan_id' => $faker->numberBetween(1, 20),
                     'item_id' => $faker->numberBetween(1, 20),
                     'jumlah' => $faker->numberBetween(1, 100),
-                    'harga_satuan' => $faker->numberBetween(1000, 100000),
                 ]
             );
         }

@@ -6,3 +6,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PenjualanController::class, 'index']);
 Route::resource('/item', ItemController::class);
+Route::resource('/penjualan', PenjualanController::class);
