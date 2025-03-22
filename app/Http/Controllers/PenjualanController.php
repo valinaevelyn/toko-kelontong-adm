@@ -63,4 +63,34 @@ class PenjualanController extends Controller
     {
         //
     }
+
+    public function pelunasan(Request $request, $id)
+    {
+        $penjualan = Penjualan::findOrFail($id);
+        $jumlahUang = $request->jumlah_uang;
+        $metode = $request->metode_pembayaran;
+
+        if ($jumlahUang < $penjualan->penjualanDetails->total_harga) {
+            return response()->json(['success' => false, 'message' => 'Jumlah uang kurang!']);
+        }
+
+        $kembalian = $jumlahUang - $penjualan->penjualanDetails->total_harga;
+
+        // Gunakan update atau save
+        $penjualan->status = 'LUNAS';
+        $penjualan->kembalian = $kembalian;
+        $penjualan->total_uang = $jumlahUang;
+        $penjualan->metode = $metode;
+        $penjualan->save(); // Simpan perubahan
+
+        return response()->json(['success' => true, 'message' => 'Penjualan berhasil dilunasi']);
+    }
+
+
+    public function updateTotalHarga()
+    {
+        $this->total_harga_akhir = $this->penjualanDetails->sum('total_harga');
+        $this->save();
+    }
+
 }

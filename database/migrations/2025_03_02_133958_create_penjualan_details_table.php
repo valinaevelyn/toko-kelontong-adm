@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->foreignId('penjualan_id')->references('id')->on('penjualans')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('item_id')->references('id')->on('items')->onDelete('cascade')->onUpdate('cascade');
             $table->integer('jumlah');
+            $table->integer('total_harga');
             $table->timestamps();
         });
     }

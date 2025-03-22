@@ -20,12 +20,12 @@ class PenjualanSeeder extends Seeder
                 [
                     'tanggal_penjualan' => $faker->dateTimeThisYear(),
                     'nama_pembeli' => $faker->name(),
-                    'total_harga' => $faker->numberBetween(1000, 100000),
+                    'total_harga_akhir' => $faker->numberBetween(1000, 100000),
                     'total_item' => $faker->numberBetween(1, 100),
                     'total_uang' => $faker->numberBetween(1000, 100000),
                     'kembalian' => $faker->numberBetween(1000, 100000),
-                    'metode' => $faker->randomElement(['cash', 'kredit']),
-                    'status' => $faker->randomElement(['lunas', 'belum lunas']),
+                    'metode' => $faker->randomElement(['CASH', 'KREDIT']),
+                    'status' => $faker->randomElement(['LUNAS', 'BELUM LUNAS']),
                 ]
             );
         }

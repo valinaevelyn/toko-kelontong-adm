@@ -19,4 +19,11 @@ class Penjualan extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function updateTotalHarga()
+    {
+        $this->total_harga_akhir = $this->penjualanDetails->sum('total_harga');
+        $this->save();
+    }
+
 }

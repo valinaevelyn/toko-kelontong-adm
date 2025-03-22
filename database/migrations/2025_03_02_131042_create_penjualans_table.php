@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->date('tanggal_penjualan');
             $table->string(('nama_pembeli'));
-            $table->integer('total_harga');
+            $table->integer('total_harga_akhir');
             $table->integer('total_item');
             $table->integer('total_uang');
             $table->integer('kembalian');

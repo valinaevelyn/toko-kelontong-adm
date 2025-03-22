@@ -1,5 +1,9 @@
 @extends('layouts.master')
 
+<head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+
 @section('content')
     <div class="container mt-4">
         <div class="row">
@@ -21,16 +25,16 @@
             <table class="table table-bordered table-primary text-center">
                 <thead>
                     <tr>
-                        <th scope="col">Tanggal</th>
-                        <th scope="col">Nama Pembeli</th>
-                        <th scope="col">Item</th>
-                        <th scope="col">Total Harga</th>
-                        <th scope="col">Total Item</th>
-                        <th scope="col">Total Uang</th>
-                        <th scope="col">Kembalian</th>
-                        <th scope="col">Metode</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Action</th>
+                        <th scope="col" class="align-middle">Tanggal</th>
+                        <th scope="col" class="align-middle">Nama Pembeli</th>
+                        <th scope="col" class="align-middle">Item</th>
+                        <th scope="col" class="align-middle">Total Harga</th>
+                        <th scope="col" class="align-middle">Total Item</th>
+                        <th scope="col" class="align-middle">Total Uang</th>
+                        <th scope="col" class="align-middle">Kembalian</th>
+                        <th scope="col" class="align-middle">Metode</th>
+                        <th scope="col" class="align-middle">Status</th>
+                        <th scope="col" class="align-middle">Action</th>
                         {{-- bisa lihat faktur dan pelunasan dan detail penjualan --}}
                     </tr>
                 </thead>
@@ -38,21 +42,24 @@
                     @foreach ($penjualans as $penjualan)
                         @if ($penjualan->count())
                             <tr class="table">
-                                <td>{{ $penjualan->tanggal_penjualan }}</td>
-                                <td>{{ $penjualan->nama_pembeli }}</td>
-                                <td>
+                                <td class="align-middle">{{ $penjualan->tanggal_penjualan }}</td>
+                                <td class="align-middle">{{ $penjualan->nama_pembeli }}</td>
+                                <td class="align-middle">
                                     {{-- loop item yang ada di penjualanDetails --}}
                                     @foreach ($penjualan->penjualanDetails as $penjualanDetail)
                                         {{ $penjualanDetail->item->nama }} ({{ $penjualanDetail->jumlah }})<br>
                                     @endforeach
                                 </td>
-                                <td>{{ 'Rp ' . number_format($penjualan->total_harga, 0, ',', '.') }}</td>
-                                <td>{{ $penjualan->total_item }}</td>
-                                <td>{{ 'Rp ' . number_format($penjualan->total_uang, 0, ',', '.') }}</td>
-                                <td>{{ 'Rp ' . number_format($penjualan->kembalian, 0, ',', '.') }}</td>
-                                <td>{{ $penjualan->metode }}</td>
-                                <td>{{ $penjualan->status }}</td>
-                                <td>
+                                <td class="align-middle">
+                                    {{ 'Rp ' . number_format($penjualan->penjualanDetails->sum('total_harga'), 0, ',', '.') }}
+                                </td>
+
+                                <td class="align-middle">{{ $penjualan->total_item }}</td>
+                                <td class="align-middle">{{ 'Rp ' . number_format($penjualan->total_uang, 0, ',', '.') }}</td>
+                                <td class="align-middle">{{ 'Rp ' . number_format($penjualan->kembalian, 0, ',', '.') }}</td>
+                                <td class="align-middle">{{ $penjualan->metode }}</td>
+                                <td class="align-middle">{{ $penjualan->status }}</td>
+                                <td class="align-middle">
                                     <div class="dropdown d-flex justify-content-center">
                                         <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
                                             id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
@@ -62,8 +69,16 @@
                                             <li><a class="dropdown-item" href="{{ route('penjualan.show', $penjualan->id) }}">Detail
                                                     Penjualan</a>
                                             </li>
-                                            <li><a class="dropdown-item" href="">Pelunasan</a></li>
-                                            <li><a class="dropdown-item" href="">Cetak Faktur</a></li>
+                                            @if($penjualan->status == 'BELUM LUNAS')
+                                                <li><a class="dropdown-item pelunasan-btn" href="#" data-id="{{ $penjualan->id }}"
+                                                        data-total="{{ $penjualan->total_harga_akhir }}">
+                                                        Pelunasan
+                                                    </a></li>
+                                            @endif
+
+                                            @if($penjualan->status == 'LUNAS')
+                                                <li><a class="dropdown-item" href="">Cetak Faktur</a></li>
+                                            @endif
 
                                         </ul>
                                     </div>
@@ -79,6 +94,44 @@
             </table>
         </div>
 
+        <!-- Modal Pelunasan -->
+        <div class="modal fade" id="pelunasanModal" tabindex="-1" aria-labelledby="pelunasanModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Pelunasan Pembayaran</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="pelunasanForm">
+                            @csrf
+                            <input type="hidden" id="penjualan_id">
+                            <div class="mb-3">
+                                <label class="form-label">Total Harga</label>
+                                <input type="text" class="form-control" id="total_harga" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Jumlah Uang</label>
+                                <input type="number" class="form-control" id="jumlah_uang" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Metode Pembayaran</label>
+                                <select class="form-control" id="metode_pembayaran" required>
+                                    <option value="CASH">Cash</option>
+                                    <option value="KREDIT">Kredit</option>
+                                </select>
+                            </div>
+                            {{-- <div id="warningText" class="text-danger d-none">Jumlah uang kurang dari total harga!</div>
+                            --}}
+                            <button type="submit" class="btn btn-primary">Konfirmasi</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
         <div class="d-flex justify-content-end">
             {{ $penjualans->links() }}
         </div>
@@ -86,3 +139,49 @@
     </div>
 
 @endsection
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('.pelunasan-btn').forEach(button => {
+            button.addEventListener("click", function () {
+                let penjualanId = this.dataset.id;
+                let totalHarga = this.dataset.total;
+
+                document.getElementById("penjualan_id").value = penjualanId;
+                document.getElementById("total_harga").value = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(totalHarga);
+
+                let modal = new bootstrap.Modal(document.getElementById('pelunasanModal'));
+                modal.show();
+            });
+        });
+
+        document.getElementById("pelunasanForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            let penjualanId = document.getElementById("penjualan_id").value;
+            let jumlahUang = parseFloat(document.getElementById("jumlah_uang").value);
+            let metodePembayaran = document.getElementById("metode_pembayaran").value;
+
+            let csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+
+            fetch(`/penjualan/pelunasan/${penjualanId}`, {
+                method: "PUT", // Ubah dari POST ke PUT
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRF-TOKEN": csrfToken
+                },
+                body: new URLSearchParams({ jumlah_uang: jumlahUang, metode_pembayaran: metodePembayaran })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert(data.message || "Terjadi kesalahan!");
+                    }
+                })
+                .catch(error => console.log(error));
+        });
+    });
+
+</script>
