@@ -12,7 +12,7 @@
             @include('partials.danger')
             @include('partials.success')
             <div class="d-flex col mr-0  justify-content-end">
-                <a href="{{ route('item.index') }}" class="btn btn-primary">Kembali</a>
+                <a href="{{ route('penjualan.index') }}" class="btn btn-primary">Kembali</a>
             </div>
         </div>
 

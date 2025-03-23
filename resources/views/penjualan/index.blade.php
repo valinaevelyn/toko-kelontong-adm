@@ -17,7 +17,7 @@
             @include('partials.success')
             <div class="d-flex col mr-0  justify-content-end">
 
-                {{-- <a href="{{ route('item.create') }}" class="btn btn-primary">Tambah Penjualan</a> --}}
+                <a href="{{ route('penjualan.create') }}" class="btn btn-primary">Tambah Penjualan</a>
             </div>
         </div>
 
@@ -77,7 +77,8 @@
                                             @endif
 
                                             @if($penjualan->status == 'LUNAS')
-                                                <li><a class="dropdown-item" href="">Cetak Faktur</a></li>
+                                                <li><a class="dropdown-item" href="{{ route('penjualan.faktur', $penjualan->id) }}"
+                                                        target="_blank">Cetak Faktur</a></li>
                                             @endif
 
                                         </ul>
@@ -165,22 +166,25 @@
             let csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
 
             fetch(`/penjualan/pelunasan/${penjualanId}`, {
-                method: "PUT", // Ubah dari POST ke PUT
+                method: "PUT",
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
+                    "Content-Type": "application/json",
                     "X-CSRF-TOKEN": csrfToken
                 },
-                body: new URLSearchParams({ jumlah_uang: jumlahUang, metode_pembayaran: metodePembayaran })
+                body: JSON.stringify({ jumlah_uang: jumlahUang, metode_pembayaran: metodePembayaran })
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert(data.message || "Terjadi kesalahan!");
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw new Error(err.message); });
                     }
+                    return response.json();
                 })
-                .catch(error => console.log(error));
+                .then(data => {
+                    alert(data.message);
+                    location.reload();
+                })
+                .catch(error => alert("Error: " + error.message));
+
         });
     });
 

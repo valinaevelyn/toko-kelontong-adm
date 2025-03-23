@@ -8,3 +8,4 @@ Route::get('/', [PenjualanController::class, 'index']);
 Route::resource('/item', ItemController::class);
 Route::resource('/penjualan', PenjualanController::class);
 Route::put('/penjualan/pelunasan/{id}', [PenjualanController::class, 'pelunasan'])->name('penjualan.pelunasan');
+Route::get('/penjualan/{id}/faktur', [PenjualanController::class, 'cetakFaktur'])->name('penjualan.faktur');

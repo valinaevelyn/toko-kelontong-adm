@@ -32,6 +32,13 @@
             }
         }
 
+        @media print {
+            header.navbar {
+                display: none;
+                /* Sembunyikan header saat mencetak */
+            }
+        }
+
         .b-example-divider {
             width: 100%;
             height: 3rem;
