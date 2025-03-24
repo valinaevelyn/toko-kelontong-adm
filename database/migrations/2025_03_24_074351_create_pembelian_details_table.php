@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('pembelian_details', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pembelian_id')->references('id')->on('penjualans')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('pembelian_id')->references('id')->on('pembelians')->onDelete('cascade')->onUpdate('cascade');
             $table->foreignId('item_id')->references('id')->on('items')->onDelete('cascade')->onUpdate('cascade');
             $table->integer('jumlah');
             $table->integer('total_harga');

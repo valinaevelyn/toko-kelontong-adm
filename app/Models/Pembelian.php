@@ -10,13 +10,7 @@ class Pembelian extends Model
 
     public function pembelianDetails()
     {
-        return $this->hasMany(PembelianDetail::class, 'pembelian_id');
-    }
-
-    // satu pembelian memiliki banyak item
-    public function items()
-    {
-        return $this->hasMany(Item::class);
+        return $this->hasMany(PembelianDetail::class);
     }
 
     // satu user bisa melakukan banyak pembelian
@@ -27,7 +21,7 @@ class Pembelian extends Model
 
     public function updateTotalHarga()
     {
-        $this->total_harga = $this->items->sum('total_harga');
+        $this->total_harga = $this->pembelianDetails->sum('total_harga');
         $this->save();
     }
 }
