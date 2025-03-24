@@ -10,16 +10,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('pembelians', function (Blueprint $table) {
+        Schema::create('pembelian_details', function (Blueprint $table) {
             $table->id();
-            $table->date('tanggal_pembelian');
-            $table->string('nama_supplier');
+            $table->foreignId('pembelian_id')->references('id')->on('penjualans')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('item_id')->references('id')->on('items')->onDelete('cascade')->onUpdate('cascade');
+            $table->integer('jumlah');
             $table->integer('total_harga');
-            $table->integer('total_item');
-            $table->integer('total_uang');
-            $table->integer('kembalian');
-            $table->string('metode');
-            $table->string('status');
             $table->timestamps();
         });
     }
@@ -29,6 +25,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('pembelians');
+        Schema::dropIfExists('pembelian_details');
     }
 };

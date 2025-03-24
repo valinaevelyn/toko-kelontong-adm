@@ -62,7 +62,7 @@ class PenjualanController extends Controller
                 return redirect()->route('penjualan.create')->with('error', 'Stok item tidak mencukupi!');
             }
 
-            $subtotal = $item['jumlah'] * $itemData->harga;
+            $subtotal = $item['jumlah'] * $itemData->harga_jual;
 
             PenjualanDetail::create([
                 'penjualan_id' => $penjualan->id,

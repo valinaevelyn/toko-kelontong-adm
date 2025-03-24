@@ -4,15 +4,15 @@
     <div class="container mt-4">
         <div class="row">
             <div class="col-md-12 fs-1 fw-3">
-                Detail Transaksi Penjualan #{{ $penjualan->id }}
+                Detail Transaksi Pembelian #{{ $pembelian->id }}
             </div>
         </div>
 
         <div class="col">
             @include('partials.danger')
             @include('partials.success')
-            <div class="d-flex col mr-0  justify-content-end">
-                <a href="{{ route('penjualan.index') }}" class="btn btn-primary">Kembali</a>
+            <div class="d-flex col mr-0 justify-content-end">
+                <a href="{{ route('pembelian.index') }}" class="btn btn-primary">Kembali</a>
             </div>
         </div>
 
@@ -28,29 +28,22 @@
                 </thead>
                 <tbody>
                     @php $totalHarga = 0; @endphp
-                    {{-- @foreach ($penjualan as $p) --}}
-                    <tr class="table">
-                        @foreach ($penjualan->penjualanDetails as $detail)
-                                @php $subtotal = $detail->jumlah * $detail->item->harga_jual; @endphp
-                                @php $totalHarga += $subtotal; @endphp
-                            <tr class="table">
-                                <td>{{ $detail->item->nama }}</td>
-                                <td>{{ $detail->jumlah }}</td>
-                                <td>{{ 'Rp ' . number_format($detail->item->harga_jual, 0, ',', '.') }}</td>
-                                <td>{{ 'Rp ' . number_format($subtotal, 0, ',', '.') }}</td>
-                            </tr>
-                        @endforeach
-                    {{-- @endforeach --}}
+                    @foreach ($pembelian->pembelianDetails as $detail)
+                        @php $subtotal = $detail->jumlah * $detail->item->harga_beli; @endphp
+                        @php $totalHarga += $subtotal; @endphp
+                        <tr class="table">
+                            <td>{{ $detail->item->nama }}</td>
+                            <td>{{ $detail->jumlah }}</td>
+                            <td>{{ 'Rp ' . number_format($detail->item->harga_beli, 0, ',', '.') }}</td>
+                            <td>{{ 'Rp ' . number_format($subtotal, 0, ',', '.') }}</td>
+                        </tr>
+                    @endforeach
                     <tr class="table">
                         <td colspan="3">Total Harga</td>
                         <td><strong>{{ 'Rp ' . number_format($totalHarga, 0, ',', '.') }}</strong></td>
-
-
                     </tr>
                 </tbody>
             </table>
         </div>
-
     </div>
-
 @endsection

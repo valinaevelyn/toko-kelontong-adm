@@ -52,11 +52,23 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="harga" class="form-label">Harga Item</label>
-                        <input type="number" class="form-control @error('harga') is-invalid @enderror" id="harga"
-                            name="harga" value={{ old('harga', $item->harga) }}>
+                        <label for="harga_jual" class="form-label">Harga Jual</label>
+                        <input type="number" class="form-control @error('harga_jual') is-invalid @enderror" id="harga_jual"
+                            name="harga_jual" value={{ old('harga_jual', $item->harga_jual) }}>
 
-                        @error('harga')
+                        @error('harga_jual')
+                            <div class="invalid-feedback">
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="harga_beli" class="form-label">Harga Beli</label>
+                        <input type="number" class="form-control @error('harga_beli') is-invalid @enderror" id="harga_beli"
+                            name="harga_beli" value={{ old('harga_beli', $item->harga_beli) }}>
+
+                        @error('harga_beli')
                             <div class="invalid-feedback">
                                 {{ $message }}
                             </div>

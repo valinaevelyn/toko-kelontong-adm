@@ -36,7 +36,7 @@ class PenjualanDetailSeeder extends Seeder
 
             foreach ($selectedItems as $itemId) {
                 $jumlah = $faker->numberBetween(1, 100);
-                $harga = Item::find($itemId)->harga; // Ambil harga item dari database
+                $harga = Item::find($itemId)->harga_jual; // Ambil harga item dari database
                 $totalHarga = $jumlah * $harga;
 
                 PenjualanDetail::create([

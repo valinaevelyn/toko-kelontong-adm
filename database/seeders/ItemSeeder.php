@@ -16,15 +16,19 @@ class ItemSeeder extends Seeder
     {
         $faker = Faker::create('id_ID');
         for ($i = 1; $i <= 20; $i++) {
-            Item::create(
-                [
-                    'nama' => $faker->word(),
-                    'merek' => $faker->company,
-                    'uom' => $faker->randomElement(['pcs', 'kg', 'm']),
-                    'harga' => $faker->numberBetween(1000, 100000),
-                    'stock' => $faker->numberBetween(1, 100),
-                ]
-            );
+            do {
+                $harga_beli = $faker->numberBetween(1000, 100000);
+                $harga_jual = $faker->numberBetween(1000, 100000);
+            } while ($harga_jual <= $harga_beli); // Looping sampai harga jual > harga beli
+
+            Item::create([
+                'nama' => $faker->word(),
+                'merek' => $faker->company,
+                'uom' => $faker->randomElement(['pcs', 'kg', 'm']),
+                'harga_beli' => $harga_beli,
+                'harga_jual' => $harga_jual,
+                'stock' => $faker->numberBetween(1, 100),
+            ]);
         }
     }
 }

@@ -4,8 +4,8 @@
     <div class="container mt-4">
         <div class="row">
             <div class="col-md-12 text-center">
-                <h2>Faktur Penjualan</h2>
-                <p class="text-muted">Tanggal: {{ $penjualan->tanggal_penjualan }}</p>
+                <h2>Faktur Pembelian</h2>
+                <p class="text-muted">Tanggal: {{ $pembelian->tanggal_pembelian }}</p>
             </div>
         </div>
 
@@ -14,12 +14,14 @@
                 <h5 class="card-title">Detail Pembelian</h5>
                 <div class="row">
                     <div class="col-md-6">
-                        <p><strong>Nama Pembeli:</strong> {{ $penjualan->nama_pembeli }}</p>
-                        <p><strong>Metode Pembayaran:</strong> {{ $penjualan->metode }}</p>
+                        <p><strong>Nama Supplier:</strong> {{ $pembelian->nama_supplier }}</p>
+                        <p><strong>Metode Pembayaran:</strong> {{ $pembelian->metode }}</p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Status:</strong> <span
-                                class="badge bg-{{ $penjualan->status == 'LUNAS' ? 'success' : 'warning' }}">{{ $penjualan->status }}</span>
+                        <p><strong>Status:</strong>
+                            <span class="badge bg-{{ $pembelian->status == 'LUNAS' ? 'success' : 'warning' }}">
+                                {{ $pembelian->status }}
+                            </span>
                         </p>
                     </div>
                 </div>
@@ -39,11 +41,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($penjualan->penjualanDetails as $detail)
+                        @foreach($pembelian->pembelianDetails as $detail)
                             <tr>
                                 <td>{{ $detail->item->nama }}</td>
                                 <td>{{ $detail->jumlah }}</td>
-                                <td>{{ 'Rp ' . number_format($detail->item->harga_jual, 0, ',', '.') }}</td>
+                                <td>{{ 'Rp ' . number_format($detail->item->harga_beli, 0, ',', '.') }}</td>
                                 <td>{{ 'Rp ' . number_format($detail->total_harga, 0, ',', '.') }}</td>
                             </tr>
                         @endforeach
@@ -51,16 +53,16 @@
                     <tfoot class="table-secondary">
                         <tr>
                             <td colspan="3" class="text-end"><strong>Total Harga:</strong></td>
-                            <td><strong>{{ 'Rp ' . number_format($penjualan->penjualanDetails->sum('total_harga'), 0, ',', '.') }}</strong>
+                            <td><strong>{{ 'Rp ' . number_format($pembelian->pembelianDetails->sum('total_harga'), 0, ',', '.') }}</strong>
                             </td>
                         </tr>
                         <tr>
                             <td colspan="3" class="text-end"><strong>Total Uang:</strong></td>
-                            <td><strong>{{ 'Rp ' . number_format($penjualan->total_uang, 0, ',', '.') }}</strong></td>
+                            <td><strong>{{ 'Rp ' . number_format($pembelian->total_uang, 0, ',', '.') }}</strong></td>
                         </tr>
                         <tr>
                             <td colspan="3" class="text-end"><strong>Kembalian:</strong></td>
-                            <td><strong>{{ 'Rp ' . number_format($penjualan->kembalian, 0, ',', '.') }}</strong></td>
+                            <td><strong>{{ 'Rp ' . number_format($pembelian->kembalian, 0, ',', '.') }}</strong></td>
                         </tr>
                     </tfoot>
                 </table>

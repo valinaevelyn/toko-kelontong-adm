@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PenjualanDetail extends Model
+class PembelianDetail extends Model
 {
     protected $guarded = [];
 
@@ -14,26 +14,29 @@ class PenjualanDetail extends Model
 
         static::saving(function ($detail) {
             if ($detail->item) {
-                $detail->total_harga = $detail->jumlah * $detail->item->harga_jual;
+                $detail->total_harga = $detail->jumlah * $detail->item->harga_beli;
             }
         });
 
         static::saved(function ($detail) {
-            $detail->penjualan->updateTotalHarga();
+            $detail->pembelian->updateTotalHarga();
         });
 
         static::deleted(function ($detail) {
-            $detail->penjualan->updateTotalHarga();
+            $detail->pembelian->updateTotalHarga();
         });
     }
 
-    public function penjualan()
-    {
-        return $this->belongsTo(Penjualan::class);
-    }
+    // aku maunya ketika transaksi pembelian item, item yang dibeli akan masuk ke items
 
     public function item()
     {
         return $this->belongsTo(Item::class);
     }
+
+    public function pembelian()
+    {
+        return $this->belongsTo(Pembelian::class);
+    }
+
 }

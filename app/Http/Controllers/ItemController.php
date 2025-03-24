@@ -35,7 +35,8 @@ class ItemController extends Controller
             'nama' => 'required',
             'merek' => 'required',
             'uom' => 'required',
-            'harga' => 'required',
+            'harga_jual' => 'required',
+            'harga_beli' => 'required',
             'stock' => 'required'
         ];
 
@@ -54,7 +55,8 @@ class ItemController extends Controller
                 'nama' => $request->input('nama'),
                 'merek' => $request->input('merek'),
                 'uom' => $request->input('uom'),
-                'harga' => $request->input('harga'),
+                'harga_jual' => $request->input('harga_jual'),
+                'harga_beli' => $request->input('harga_beli'),
                 'stock' => $request->input('stock')
             ]);
 
@@ -87,7 +89,8 @@ class ItemController extends Controller
             'nama' => 'required',
             'merek' => 'required',
             'uom' => 'required',
-            'harga' => 'required',
+            'harga_jual' => 'required',
+            'harga_beli' => 'required',
             'stock' => 'required'
         ];
 
@@ -105,7 +108,8 @@ class ItemController extends Controller
             $item->nama = $request->nama;
             $item->merek = $request->merek;
             $item->uom = $request->uom;
-            $item->harga = $request->harga;
+            $item->harga_jual = $request->harga_jual;
+            $item->harga_beli = $request->harga_beli;
             $item->stock = $request->stock;
             $item->save();
 

@@ -19,4 +19,6 @@ class Item extends Model
     {
         return $this->belongsTo(Pembelian::class);
     }
+
+
 }

@@ -25,7 +25,8 @@
                         <th scope="col">Nama</th>
                         <th scope="col">Merk</th>
                         <th scope="col">UOM</th>
-                        <th scope="col">Harga</th>
+                        <th scope="col">Harga Jual</th>
+                        <th scope="col">Harga Beli</th>
                         <th scope="col">Stock</th>
                         <th scope="col">Action</th>
                     </tr>
@@ -37,7 +38,8 @@
                                 <td>{{ $item->nama }}</td>
                                 <td>{{ $item->merek }}</td>
                                 <td>{{ $item->uom }}</td>
-                                <td>{{ $item->harga }}</td>
+                                <td>{{ $item->harga_jual }}</td>
+                                <td>{{ $item->harga_beli }}</td>
                                 <td>{{ $item->stock }}</td>
                                 <td>
                                     <div class="dropdown d-flex justify-content-center">
@@ -62,7 +64,7 @@
                             </tr>
                         @else
                             <tr class="table-secondary">
-                                <td colspan="2">Tidak ada item tersedia.</td>
+                                <td colspan="6">Tidak ada item tersedia.</td>
                             </tr>
                         @endif
                     @endforeach

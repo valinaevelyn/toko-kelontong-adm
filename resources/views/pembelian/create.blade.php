@@ -2,16 +2,16 @@
 
 @section('content')
     <div class="container mt-4">
-        <h2>Tambah Penjualan</h2>
+        <h2>Tambah Pembelian</h2>
 
         @include('partials.danger')
         @include('partials.success')
 
-        <form action="{{ route('penjualan.store') }}" method="POST">
+        <form action="{{ route('pembelian.store') }}" method="POST">
             @csrf
             <div class="mb-4 mt-4">
-                <label class="form-label">Nama Pembeli</label>
-                <input type="text" name="nama_pembeli" class="form-control" required>
+                <label class="form-label">Nama Supplier</label>
+                <input type="text" name="nama_supplier" class="form-control" required>
             </div>
 
             <h4>Items</h4>
@@ -20,6 +20,7 @@
                     <tr>
                         <th>Item</th>
                         <th>Jumlah</th>
+                        <th>Harga Beli Satuan</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -29,15 +30,17 @@
                             <select name="items[0][id]" class="form-select" required>
                                 <option value="" selected disabled>Pilih Item</option>
                                 @foreach($items as $item)
-                                    <option value="{{ $item->id }}" data-stock="{{ $item->stock }}">
-                                        {{ $item->nama }} (Stok: {{ $item->stock }}, Rp
-                                        {{ number_format($item->harga_jual, 0, ',', '.') }})
+                                    <option value="{{ $item->id }}">
+                                        {{ $item->nama }} (Stok: {{ $item->stock }})
                                     </option>
                                 @endforeach
                             </select>
                         </td>
                         <td>
                             <input type="number" name="items[0][jumlah]" class="form-control" min="1" required>
+                        </td>
+                        <td>
+                            <input type="number" name="items[0][harga_beli]" class="form-control" min="1" required>
                         </td>
                         <td>
                             <button type="button" class="btn btn-danger remove-item" disabled>Hapus</button>
@@ -66,15 +69,17 @@
                             <select name="items[${itemIndex}][id]" class="form-select" required>
                                 <option value="" selected disabled>Pilih Item</option>
                                 @foreach($items as $item)
-                                    <option value="{{ $item->id }}" data-stock="{{ $item->stock }}">
-                                        {{ $item->nama }} (Stok: {{ $item->stock }}, Rp
-                                        {{ number_format($item->harga_jual, 0, ',', '.') }})
+                                    <option value="{{ $item->id }}">
+                                        {{ $item->nama }} (Stok: {{ $item->stock }})
                                     </option>
                                 @endforeach
                             </select>
                         </td>
                         <td>
                             <input type="number" name="items[${itemIndex}][jumlah]" class="form-control" min="1" required>
+                        </td>
+                        <td>
+                            <input type="number" name="items[${itemIndex}][harga_beli]" class="form-control" min="1" required>
                         </td>
                         <td>
                             <button type="button" class="btn btn-danger remove-item">Hapus</button>
