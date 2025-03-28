@@ -1,116 +1,62 @@
-<div class="sidebar border border-right col-md-3 col-lg-2 p-0 bg-body-tertiary">
-    <div class="offcanvas-md offcanvas-end bg-body-tertiary" tabindex="-1" id="sidebarMenu"
+<div class="sidebar border-end bg-dark text-white col-md-3 col-lg-2 p-0" style="min-height: 100vh;">
+    <div class="offcanvas-md offcanvas-end bg-dark text-white" tabindex="-1" id="sidebarMenu"
         aria-labelledby="sidebarMenuLabel">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="sidebarMenuLabel">AS MART</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu"
-                aria-label="Close"></button>
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title text-uppercase fw-bold" id="sidebarMenuLabel">AS MART</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                data-bs-target="#sidebarMenu" aria-label="Close"></button>
         </div>
-        <div class="offcanvas-body d-md-flex flex-column p-0 pt-lg-3 overflow-y-auto">
+        <div class="offcanvas-body d-md-flex flex-column p-0 pt-3 overflow-y-auto">
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2 active" aria-current="page" href="#">
-                        <svg class="bi">
-                            <use xlink:href="#house-fill" />
-                        </svg>
+                    <a class="nav-link d-flex align-items-center gap-2 text-white @yield('dashboardActive') p-3"
+                        aria-current="page" href="/">
+                        <i class="bi bi-house-fill"></i>
                         Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2" href="/penjualan">
-                        <svg class="bi">
-                            <use xlink:href="#file-earmark" />
-                        </svg>
+                    <a class="nav-link d-flex align-items-center gap-2 text-white p-3 @yield('penjualanActive')"
+                        href="/penjualan">
+                        <i class="bi bi-file-earmark"></i>
                         Penjualan
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2" href="/item">
-                        <svg class="bi">
-                            <use xlink:href="#cart" />
-                        </svg>
+                    <a class="nav-link d-flex align-items-center gap-2 text-white p-3 @yield('itemActive')"
+                        href="/item">
+                        <i class="bi bi-cart"></i>
                         Item
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2" href="/pembelian">
-                        <svg class="bi">
-                            <use xlink:href="#people" />
-                        </svg>
+                    <a class="nav-link d-flex align-items-center gap-2 text-white p-3 @yield('pembelianActive')"
+                        href="/pembelian">
+                        <i class="bi bi-people"></i>
                         Pembelian
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2" href="#">
-                        <svg class="bi">
-                            <use xlink:href="#graph-up" />
-                        </svg>
+                    <a class="nav-link d-flex align-items-center gap-2 text-white p-3 @yield('reportActive')"
+                        href="/laporan-kas">
+                        <i class="bi bi-bar-chart-line"></i>
                         Reports
                     </a>
                 </li>
-
             </ul>
 
-            {{-- <h6
-                class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">
-                <span>Saved reports</span>
-                <a class="link-secondary" href="#" aria-label="Add a new report">
-                    <svg class="bi">
-                        <use xlink:href="#plus-circle" />
-                    </svg>
-                </a>
-            </h6>
-            <ul class="nav flex-column mb-auto">
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2" href="#">
-                        <svg class="bi">
-                            <use xlink:href="#file-earmark-text" />
-                        </svg>
-                        Current month
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2" href="#">
-                        <svg class="bi">
-                            <use xlink:href="#file-earmark-text" />
-                        </svg>
-                        Last quarter
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2" href="#">
-                        <svg class="bi">
-                            <use xlink:href="#file-earmark-text" />
-                        </svg>
-                        Social engagement
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2" href="#">
-                        <svg class="bi">
-                            <use xlink:href="#file-earmark-text" />
-                        </svg>
-                        Year-end sale
-                    </a>
-                </li>
-            </ul> --}}
-
-            <hr class="my-3">
+            <hr class="my-3 border-light">
 
             <ul class="nav flex-column mb-auto">
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2" href="#">
-                        <svg class="bi">
-                            <use xlink:href="#gear-wide-connected" />
-                        </svg>
+                    <a class="nav-link d-flex align-items-center gap-2 text-white p-3" href="#">
+                        <i class="bi bi-gear-wide-connected"></i>
                         Settings
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2" href="#">
-                        <svg class="bi">
-                            <use xlink:href="#door-closed" />
-                        </svg>
+                    <a class="nav-link d-flex align-items-center gap-2 text-white p-3" href="#">
+                        <i class="bi bi-door-closed"></i>
                         Sign out
                     </a>
                 </li>
@@ -118,3 +64,44 @@
         </div>
     </div>
 </div>
+
+<style>
+    /* Sidebar */
+    .sidebar {
+        background: #1f1f1f;
+        /* Warna gelap solid */
+        min-height: 100vh;
+        transition: all 0.3s ease-in-out;
+    }
+
+    /* Styling untuk setiap item menu */
+    .nav-link {
+        transition: all 0.3s ease-in-out;
+        border-radius: 5px;
+        font-size: 15px;
+        padding: 12px 15px;
+        color: #ddd;
+        /* Warna teks sedikit redup agar nyaman dilihat */
+    }
+
+    /* Hover efek minimalis */
+    .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+    }
+
+    /* Menu aktif lebih tegas */
+    .nav-link.active {
+        background: #007bff;
+        color: white;
+        font-weight: 600;
+        border-left: 4px solid #0056b3;
+        /* Garis tepi untuk penekanan */
+    }
+
+    /* Header Sidebar */
+    .offcanvas-header {
+        background: #1f1f1f;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+</style>

@@ -1,5 +1,5 @@
 @extends('layouts.master')
-
+@section('penjualanActive', 'active')
 @section('content')
     <div class="container mt-4">
         <h2>Tambah Penjualan</h2>

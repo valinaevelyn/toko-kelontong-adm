@@ -1,5 +1,5 @@
 @extends('layouts.master')
-
+@section('pembelianActive', 'active')
 @section('content')
     <div class="container mt-4">
         <div class="row">
@@ -73,4 +73,30 @@
             <a href="#" onclick="window.print()" class="btn btn-primary"><i class="bi bi-printer"></i> Cetak Faktur</a>
         </div>
     </div>
+
+    <style>
+        <style>.table {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table th {
+            background: #0056b3 !important;
+            color: white;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(0, 86, 179, 0.1);
+        }
+
+        /* Styling untuk Card dan Tombol */
+        .btn-primary {
+            border-radius: 5px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3 !important;
+        }
+    </style>
 @endsection

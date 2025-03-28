@@ -3,7 +3,7 @@
 <head>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
-
+@section('penjualanActive', 'active')
 @section('content')
     <div class="container mt-4">
         <div class="row">
@@ -11,13 +11,14 @@
                 Penjualan
             </div>
         </div>
+        <hr>
 
         <div class="col">
             @include('partials.danger')
             @include('partials.success')
             <div class="d-flex col mr-0  justify-content-end">
 
-                <a href="{{ route('penjualan.create') }}" class="btn btn-primary">Tambah Penjualan</a>
+                <a href="{{ route('penjualan.create') }}" class="btn btn-success">Tambah Penjualan</a>
             </div>
         </div>
 
@@ -138,6 +139,47 @@
         </div>
 
     </div>
+
+    <style>
+        .table {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .table th {
+            background: #0056b3 !important;
+            color: white;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(0, 86, 179, 0.1);
+        }
+
+        /* Styling untuk Card dan Tombol */
+        .btn-primary {
+            border-radius: 5px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3 !important;
+        }
+
+        /* Styling Modal */
+        .modal-content {
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            background-color: #007bff !important;
+            color: white;
+        }
+
+        .table {
+            overflow: visible !important;
+        }
+    </style>
 
 @endsection
 
