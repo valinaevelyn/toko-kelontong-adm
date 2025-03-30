@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->string('keterangan');
             $table->integer('kas_masuk')->default(0);
             $table->integer('kas_keluar')->default(0);
+            $table->integer('saldo')->default(0);
             $table->timestamps();
         });
     }

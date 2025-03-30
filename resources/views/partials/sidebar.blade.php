@@ -10,7 +10,7 @@
             <ul class="nav flex-column">
                 <li class="nav-item">
                     <a class="nav-link d-flex align-items-center gap-2 text-white @yield('dashboardActive') p-3"
-                        aria-current="page" href="/">
+                        aria-current="page" href="/dashboard">
                         <i class="bi bi-house-fill"></i>
                         Dashboard
                     </a>
@@ -48,14 +48,14 @@
             <hr class="my-3 border-light">
 
             <ul class="nav flex-column mb-auto">
-                <li class="nav-item">
+                {{-- <li class="nav-item">
                     <a class="nav-link d-flex align-items-center gap-2 text-white p-3" href="#">
                         <i class="bi bi-gear-wide-connected"></i>
                         Settings
                     </a>
-                </li>
+                </li> --}}
                 <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2 text-white p-3" href="#">
+                    <a class="nav-link d-flex align-items-center gap-2 text-white p-3" href="/logout">
                         <i class="bi bi-door-closed"></i>
                         Sign out
                     </a>

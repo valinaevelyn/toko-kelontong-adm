@@ -4,35 +4,77 @@ namespace App\Http\Controllers;
 
 use App\Models\LaporanKas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class LaporanKasController extends Controller
 {
     public function index(Request $request)
     {
-        $laporanKasUtama = \DB::table('laporan_kas')
-            ->select('tanggal', 'kas_masuk', 'kas_keluar', 'keterangan')
-            ->get();
+        // Ambil parameter bulan dari request
+        $bulan = $request->input('bulan');
 
-        // Ambil transaksi penjualan yang sudah lunas (sebagai kas_masuk)
-        $penjualanLunas = \DB::table('penjualans')
+
+        // Jika filter bulan dipilih, buat variabel filter
+        if (!empty($bulan) && $bulan !== 'ALL') {
+            $date = Carbon::createFromFormat('Y-m-d', $bulan . '-01');
+            $year = $date->year;
+            $month = $date->month;
+        } else {
+            $year = null;
+            $month = null;
+        }
+
+        // Query dasar untuk laporan kas utama
+        $laporanKasUtama = DB::table('laporan_kas')
+            ->select('tanggal', 'kas_masuk', 'kas_keluar', 'keterangan');
+
+        if ($year && $month) {
+            $laporanKasUtama = $laporanKasUtama
+                ->whereYear('tanggal', $year)
+                ->whereMonth('tanggal', $month);
+        }
+
+
+        // Query transaksi penjualan yang sudah lunas (sebagai kas_masuk)
+        $penjualanLunas = DB::table('penjualans')
             ->where('status', 'LUNAS')
-            ->select('tanggal_penjualan as tanggal', 'total_harga_akhir as kas_masuk', \DB::raw('NULL as kas_keluar'), \DB::raw("'Penjualan' as keterangan"))
-            ->get();
+            ->select(
+                'tanggal_penjualan as tanggal',
+                'total_harga_akhir as kas_masuk',
+                DB::raw('NULL as kas_keluar'),
+                DB::raw("'Penjualan' as keterangan")
+            );
 
-        // Ambil transaksi pembelian yang sudah lunas (sebagai kas_keluar)
-        $pembelianLunas = \DB::table('pembelians')
+        if ($year && $month) {
+            $penjualanLunas = $penjualanLunas
+                ->whereYear('tanggal_penjualan', $year)
+                ->whereMonth('tanggal_penjualan', $month);
+        }
+
+        // Query transaksi pembelian yang sudah lunas (sebagai kas_keluar)
+        $pembelianLunas = DB::table('pembelians')
             ->where('status', 'LUNAS')
-            ->select('tanggal_pembelian as tanggal', \DB::raw('NULL as kas_masuk'), 'total_harga as kas_keluar', \DB::raw("'Pembelian' as keterangan"))
-            ->get();
+            ->select(
+                'tanggal_pembelian as tanggal',
+                DB::raw('NULL as kas_masuk'),
+                'total_harga as kas_keluar',
+                DB::raw("'Pembelian' as keterangan")
+            );
 
+        if ($year && $month) {
+            $pembelianLunas = $pembelianLunas
+                ->whereYear('tanggal_pembelian', $year)
+                ->whereMonth('tanggal_pembelian', $month);
+        }
 
-        // Menggabungkan semua transaksi ke dalam laporan kas
-        $laporanKas = $laporanKasUtama->concat($penjualanLunas)->concat($pembelianLunas);
+        // Gabungkan semua transaksi menggunakan union
+        $laporanKas = $laporanKasUtama->union($penjualanLunas)->union($pembelianLunas);
 
-        // Mengurutkan laporan kas berdasarkan tanggal
-        $laporanKas = $laporanKas->sortBy('tanggal')->values();
+        // Ambil data dan urutkan berdasarkan tanggal
+        $laporanKas = $laporanKas->orderBy('tanggal')->get();
 
-        return view('laporan.kas', compact('laporanKas'));
+        return view('laporan.kas', compact('laporanKas', 'bulan'));
     }
 
     public function storeBiaya(Request $request)
