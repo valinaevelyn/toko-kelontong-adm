@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             PenjualanSeeder::class,
             PembelianSeeder::class,
             PenjualanDetailSeeder::class,
+            PembelianDetailSeeder::class,
         ]);
     }
 }
