@@ -6,6 +6,7 @@
             <div class="col-md-12 text-center">
                 <h2>Faktur Penjualan</h2>
                 <p class="text-muted">Tanggal: {{ $penjualan->tanggal_penjualan }}</p>
+                <p><strong>No. Faktur:</strong> {{ $penjualan->no_faktur }}</p>
             </div>
         </div>
 
@@ -95,6 +96,41 @@
 
         .btn-primary:hover {
             background-color: #0056b3 !important;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            .container {
+                margin-top: 0 !important;
+                padding: 0 !important;
+            }
+
+            .d-flex.justify-content-end.mt-3 {
+                display: none;
+                /* Sembunyikan tombol cetak saat print */
+            }
+
+            @page {
+                margin: 1cm;
+            }
+
+            .mt-4,
+            .mt-3 {
+                margin-top: 10px !important;
+            }
+
+            h2 {
+                font-size: 20px;
+                margin: 10px 0;
+            }
+
+            p {
+                margin: 5px 0;
+            }
         }
     </style>
 @endsection

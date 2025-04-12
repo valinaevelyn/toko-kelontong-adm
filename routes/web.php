@@ -26,4 +26,6 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/laporan-kas', [LaporanKasController::class, 'index'])->name('laporan.kas');
     Route::post('/laporan-kas/biaya', [LaporanKasController::class, 'storeBiaya'])->name('laporan.kas.biaya');
+
+    Route::post('/dashboard/transfer-saldo', [DashboardController::class, 'transferSaldo'])->name('dashboard.transferSaldo');
 });

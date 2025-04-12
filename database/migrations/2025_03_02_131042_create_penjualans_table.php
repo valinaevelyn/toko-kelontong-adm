@@ -16,10 +16,13 @@ return new class extends Migration {
             $table->string(('nama_pembeli'));
             $table->integer('total_harga_akhir');
             $table->integer('total_item');
-            $table->integer('total_uang');
-            $table->integer('kembalian');
+            $table->integer('total_uang')->nullable();
+            $table->integer('kembalian')->nullable();
             $table->string('metode');
             $table->string('status');
+            $table->string('no_faktur');
+            $table->string('kode_cek')->nullable();
+            $table->date('tanggal_cair')->nullable();
             $table->timestamps();
         });
     }

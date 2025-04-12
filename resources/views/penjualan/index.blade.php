@@ -23,6 +23,18 @@
         </div>
 
         <div class="col mt-4">
+            <div class="d-flex justify-content-start mb-3">
+                <form action="{{ route('penjualan.index') }}" method="GET" class="d-flex">
+                    <select name="status" class="form-select me-2" onchange="this.form.submit()">
+                        <option value="">Semua Status</option>
+                        <option value="LUNAS" {{ request('status') == 'LUNAS' ? 'selected' : '' }}>LUNAS</option>
+                        <option value="BELUM LUNAS" {{ request('status') == 'BELUM LUNAS' ? 'selected' : '' }}>BELUM LUNAS
+                        </option>
+                    </select>
+                    <noscript><button type="submit" class="btn btn-primary">Filter</button></noscript>
+                </form>
+            </div>
+
             <table class="table table-bordered table-primary text-center">
                 <thead>
                     <tr>
@@ -109,22 +121,32 @@
                             @csrf
                             <input type="hidden" id="penjualan_id">
                             <div class="mb-3">
-                                <label class="form-label">Total Harga</label>
-                                <input type="text" class="form-control" id="total_harga" readonly>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Jumlah Uang</label>
-                                <input type="number" class="form-control" id="jumlah_uang" required>
-                            </div>
-                            <div class="mb-3">
                                 <label class="form-label">Metode Pembayaran</label>
                                 <select class="form-control" id="metode_pembayaran" required>
                                     <option value="CASH">Cash</option>
                                     <option value="KREDIT">Kredit</option>
+                                    <option value="CEK">Cek</option>
+                                    <option value="TRANSFER">Transfer</option>
                                 </select>
                             </div>
-                            {{-- <div id="warningText" class="text-danger d-none">Jumlah uang kurang dari total harga!</div>
-                            --}}
+                            <div class="mb-3">
+                                <label class="form-label">Total Harga</label>
+                                <input type="text" class="form-control" id="total_harga" readonly>
+                            </div>
+                            <div class="mb-3" id="jumlah_uang_group">
+                                <label class="form-label">Jumlah Uang</label>
+                                <input type="number" class="form-control" id="jumlah_uang">
+                            </div>
+
+                            <div class="mb-3" id="cek-fields-code">
+                                <label class="form-label">Kode Cek</label>
+                                <input type="text" class="form-control" id="kode_cek">
+                            </div>
+                            <div class="mb-3" id="cek-fields-date">
+                                <label class="form-label">Tanggal Cair</label>
+                                <input type="date" class="form-control" id="tanggal_cair">
+                            </div>
+
                             <button type="submit" class="btn btn-primary">Konfirmasi</button>
                         </form>
                     </div>
@@ -134,8 +156,10 @@
 
 
 
+
+
         <div class="d-flex justify-content-end">
-            {{ $penjualans->links() }}
+            {{ $penjualans->appends(['status' => request('status')])->links() }}
         </div>
 
     </div>
@@ -185,11 +209,13 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        // Menangani klik tombol pelunasan untuk memunculkan modal
         document.querySelectorAll('.pelunasan-btn').forEach(button => {
             button.addEventListener("click", function () {
                 let penjualanId = this.dataset.id;
                 let totalHarga = this.dataset.total;
 
+                // Mengisi data ke dalam modal
                 document.getElementById("penjualan_id").value = penjualanId;
                 document.getElementById("total_harga").value = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(totalHarga);
 
@@ -198,14 +224,67 @@
             });
         });
 
+        // Menangani perubahan pada dropdown metode pembayaran
+        document.getElementById("metode_pembayaran").addEventListener("change", function () {
+            let metode = this.value;
+
+            // Menyembunyikan atau menampilkan field berdasarkan metode pembayaran
+            if (metode === 'CASH') {
+                document.getElementById("jumlah_uang_group").style.display = 'block'; // tampilkan input jumlah uang
+                document.getElementById("cek-fields-code").style.display = 'none';
+                document.getElementById("cek-fields-date").style.display = 'none';
+            } else if (metode === 'CEK') {
+                document.getElementById("jumlah_uang_group").style.display = 'none'; // sembunyikan input jumlah uang
+                document.getElementById("cek-fields-code").style.display = 'block'; // tampilkan input cek
+                document.getElementById("cek-fields-date").style.display = 'block'; // tampilkan input cek
+            } else {
+                document.getElementById("jumlah_uang_group").style.display = 'none'; // sembunyikan input jumlah uang
+                document.getElementById("cek-fields-code").style.display = 'none';
+                document.getElementById("cek-fields-date").style.display = 'none';
+            }
+        });
+
+        // Panggil function untuk menerapkan rule berdasarkan metode pembayaran yang sudah terpilih
+        function applyPaymentMethodRule() {
+            let metode = document.getElementById("metode_pembayaran").value;
+
+            // Menyembunyikan atau menampilkan field berdasarkan metode pembayaran yang sudah terpilih
+            if (metode === 'CASH') {
+                document.getElementById("jumlah_uang_group").style.display = 'block';
+                document.getElementById("cek-fields-code").style.display = 'none';
+                document.getElementById("cek-fields-date").style.display = 'none';
+            } else if (metode === 'CEK') {
+                document.getElementById("jumlah_uang_group").style.display = 'none';
+                document.getElementById("cek-fields-code").style.display = 'block';
+                document.getElementById("cek-fields-date").style.display = 'block';
+            } else {
+                document.getElementById("jumlah_uang_group").style.display = 'none';
+                document.getElementById("cek-fields-code").style.display = 'none';
+                document.getElementById("cek-fields-date").style.display = 'none';
+            }
+        }
+
+        // Panggil function applyPaymentMethodRule saat halaman pertama kali dibuka
+        applyPaymentMethodRule();
+
+        // Tangani submit form pelunasan
         document.getElementById("pelunasanForm").addEventListener("submit", function (e) {
             e.preventDefault();
 
             let penjualanId = document.getElementById("penjualan_id").value;
-            let jumlahUang = parseFloat(document.getElementById("jumlah_uang").value);
+            let jumlahUang = parseFloat(document.getElementById("jumlah_uang").value) || 0;
             let metodePembayaran = document.getElementById("metode_pembayaran").value;
+            let kodeCek = document.getElementById("kode_cek").value;
+            let tanggalCair = document.getElementById("tanggal_cair").value;
 
             let csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+
+            let requestData = {
+                jumlah_uang: jumlahUang,
+                metode_pembayaran: metodePembayaran,
+                kode_cek: kodeCek,
+                tanggal_cair: tanggalCair
+            };
 
             fetch(`/penjualan/pelunasan/${penjualanId}`, {
                 method: "PUT",
@@ -213,21 +292,14 @@
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": csrfToken
                 },
-                body: JSON.stringify({ jumlah_uang: jumlahUang, metode_pembayaran: metodePembayaran })
+                body: JSON.stringify(requestData)
             })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => { throw new Error(err.message); });
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
                     alert(data.message);
                     location.reload();
                 })
                 .catch(error => alert("Error: " + error.message));
-
         });
     });
-
 </script>

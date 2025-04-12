@@ -6,6 +6,7 @@
             <div class="col-md-12 text-center">
                 <h2>Faktur Pembelian</h2>
                 <p class="text-muted">Tanggal: {{ $pembelian->tanggal_pembelian }}</p>
+                <p><strong>No. Faktur:</strong> {{ $pembelian->no_faktur }}</p>
             </div>
         </div>
 

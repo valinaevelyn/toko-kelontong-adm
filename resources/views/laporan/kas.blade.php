@@ -40,6 +40,7 @@
                 <thead class="table-dark">
                     <tr>
                         <th>TANGGAL</th>
+                        <th>NAMA</th>
                         <th>KETERANGAN</th>
                         <th>DEBET</th>
                         <th>KREDIT</th>
@@ -49,6 +50,7 @@
                     @foreach($laporanKas as $laporan)
                         <tr>
                             <td>{{ $laporan->tanggal }}</td>
+                            <td>{{ $laporan->nama }}</td>
                             <td>{{ $laporan->keterangan }}</td>
                             <td>{{ $laporan->kas_masuk ? 'Rp ' . number_format($laporan->kas_masuk, 0, ',', '.') : '-' }}</td>
                             <td>{{ $laporan->kas_keluar ? 'Rp ' . number_format($laporan->kas_keluar, 0, ',', '.') : '-' }}</td>
@@ -73,6 +75,10 @@
                             <div class="mb-3">
                                 <label for="tanggal" class="form-label">Tanggal</label>
                                 <input type="date" name="tanggal" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="nama" class="form-label">Nama</label>
+                                <input type="text" name="nama" class="form-control" placeholder="Nama" required>
                             </div>
                             <div class="mb-3">
                                 <label for="keterangan" class="form-label">Keterangan</label>

@@ -27,7 +27,7 @@ class LaporanKasController extends Controller
 
         // Query dasar untuk laporan kas utama
         $laporanKasUtama = DB::table('laporan_kas')
-            ->select('tanggal', 'kas_masuk', 'kas_keluar', 'keterangan');
+            ->select('tanggal', 'nama', 'kas_masuk', 'kas_keluar', 'keterangan');
 
         if ($year && $month) {
             $laporanKasUtama = $laporanKasUtama
@@ -41,6 +41,7 @@ class LaporanKasController extends Controller
             ->where('status', 'LUNAS')
             ->select(
                 'tanggal_penjualan as tanggal',
+                'nama_pembeli as nama',
                 'total_harga_akhir as kas_masuk',
                 DB::raw('NULL as kas_keluar'),
                 DB::raw("'Penjualan' as keterangan")
@@ -57,6 +58,7 @@ class LaporanKasController extends Controller
             ->where('status', 'LUNAS')
             ->select(
                 'tanggal_pembelian as tanggal',
+                'nama_supplier as nama',
                 DB::raw('NULL as kas_masuk'),
                 'total_harga as kas_keluar',
                 DB::raw("'Pembelian' as keterangan")
@@ -81,6 +83,7 @@ class LaporanKasController extends Controller
     {
         $request->validate([
             'tanggal' => 'required|date',
+            'nama' => 'required|string',
             'keterangan' => 'required|string',
             'kas_masuk' => 'nullable|integer',
             'kas_keluar' => 'nullable|integer',
@@ -93,6 +96,7 @@ class LaporanKasController extends Controller
 
         LaporanKas::create([
             'tanggal' => $request->tanggal,
+            'nama' => $request->nama,
             'keterangan' => $request->keterangan,
             'kas_masuk' => $kasMasuk,
             'kas_keluar' => $kasKeluar,

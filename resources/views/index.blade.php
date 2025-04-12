@@ -51,7 +51,7 @@
         <h1 class="h2">Dashboard</h1>
     </div>
 
-    <div class="row">
+    <div class="row d-flex justify-content-center">
         <div class="col-md-3">
             <div class="card text-white bg-success mb-3">
                 <div class="card-body">
@@ -68,6 +68,18 @@
                 </div>
             </div>
         </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Keuntungan Bersih</h5>
+                    <h3>Rp {{ number_format($keuntungan_bersih, 0, ',', '.') }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row d-flex justify-content-center">
         <div class="col-md-3">
             <div class="card text-white bg-primary mb-3">
                 <div class="card-body">
@@ -76,13 +88,73 @@
                 </div>
             </div>
         </div>
+
         <div class="col-md-3">
-            <div class="card text-white bg-warning mb-3">
+            <div class="card text-white bg-primary mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Keuntungan Bersih</h5>
-                    <h3>Rp {{ number_format($keuntungan_bersih, 0, ',', '.') }}</h3>
+                    <h5 class="card-title">Saldo Bank</h5>
+                    <h3>Rp {{ number_format($saldo_bank, 0, ',', '.') }}</h3>
                 </div>
             </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Saldo Piutang</h5>
+                    <h3>Rp {{ number_format($saldo_piutang, 0, ',', '.') }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Button untuk buka modal -->
+    <div class="text-center mt-4">
+        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#transferModal">
+            Pindahkan Saldo Bank/Kas
+        </button>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="transferModal" tabindex="-1" aria-labelledby="transferModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="{{ route('dashboard.transferSaldo') }}" method="POST">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="transferModalLabel">Transfer Saldo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="dari" class="form-label">Dari</label>
+                            <select class="form-select" name="dari" id="dari" required>
+                                <option value="BANK">Bank</option>
+                                <option value="KAS">Kas</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="ke" class="form-label">Ke</label>
+                            <select class="form-select" name="ke" id="ke" required>
+                                <option value="KAS">Kas</option>
+                                <option value="BANK">Bank</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="jumlah" class="form-label">Jumlah Transfer</label>
+                            <input type="number" name="jumlah" class="form-control" min="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="catatan" class="form-label">Catatan (Opsional)</label>
+                            <input type="text" name="catatan" class="form-control">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Transfer</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 

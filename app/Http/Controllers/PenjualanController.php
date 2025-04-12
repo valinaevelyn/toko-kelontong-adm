@@ -6,15 +6,24 @@ use App\Models\Item;
 use App\Models\Penjualan;
 use App\Models\PenjualanDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Str;
 
 class PenjualanController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $penjualans = Penjualan::latest()->paginate(10);
+        $query = Penjualan::with('penjualanDetails.item')->latest();
+
+        if ($request->has('status') && in_array($request->status, ['LUNAS', 'BELUM LUNAS'])) {
+            $query->where('status', $request->status);
+        }
+
+        $penjualans = $query->paginate(10);
+
         return view('penjualan.index', compact('penjualans'));
     }
 
@@ -39,8 +48,14 @@ class PenjualanController extends Controller
             'items.*.jumlah' => 'required|integer|min:1',
         ]);
 
+        $tanggal = Carbon::now();
+        $prefix = 'F' . $tanggal->format('Ym'); // contoh: F202504
+        $randomCode = strtoupper(Str::random(6)); // contoh: 6 karakter acak
+        $noFaktur = $prefix . '-' . $randomCode;
+
         // Buat transaksi penjualan
         $penjualan = Penjualan::create([
+            'no_faktur' => $noFaktur,
             'nama_pembeli' => $request->nama_pembeli,
             'tanggal_penjualan' => now(),
             'total_harga_akhir' => 0, // Akan di-update setelah menambahkan detail
@@ -120,32 +135,37 @@ class PenjualanController extends Controller
 
     public function pelunasan(Request $request, $id)
     {
+        $request->validate([
+            'jumlah_uang' => 'nullable|required_if:metode_pembayaran,CASH|numeric|min:0',
+            'metode_pembayaran' => 'required|in:CASH,KREDIT,CEK,TRANSFER',
+            'kode_cek' => 'required_if:metode_pembayaran,CEK|string|nullable',
+            'tanggal_cair' => 'required_if:metode_pembayaran,CEK|date|nullable',
+        ]);
+
         $penjualan = Penjualan::findOrFail($id);
+        $totalHarga = $penjualan->penjualanDetails->sum('total_harga');
         $jumlahUang = $request->jumlah_uang;
         $metode = $request->metode_pembayaran;
-        $totalHarga = $penjualan->penjualanDetails->sum('total_harga');
 
-        if ($jumlahUang < $totalHarga) {
-            return response()->json(['success' => false, 'message' => 'Jumlah uang kurang!']);
+        if ($metode == 'CASH' && $jumlahUang < $totalHarga) {
+            return response()->json(['success' => false, 'message' => 'Jumlah uang kurang!'], 400);
         }
 
-        $kembalian = $jumlahUang - $totalHarga;
+        $kembalian = ($metode == 'CASH') ? $jumlahUang - $totalHarga : 0;
 
-        // Gunakan update atau save
         $penjualan->status = 'LUNAS';
         $penjualan->kembalian = $kembalian;
-        $penjualan->total_uang = $jumlahUang;
+        $penjualan->total_uang = $metode == 'CASH' ? $jumlahUang : 0;
         $penjualan->metode = $metode;
-        $penjualan->save(); // Simpan perubahan
 
-        // $penjualan->update([
-        //     'status' => 'LUNAS',
-        //     'kembalian' => $kembalian,
-        //     'total_uang' => $jumlahUang,
-        //     'metode' => $metode,
-        // ]);
+        if ($metode == 'CEK') {
+            $penjualan->kode_cek = $request->kode_cek;
+            $penjualan->tanggal_cair = $request->tanggal_cair;
+        }
 
-        return response()->json(['success' => true, 'message' => 'Penjualan berhasil dilunasi']);
+        $penjualan->save();
+
+        return response()->json(['success' => true, 'message' => 'Penjualan berhasil dilunasi'], 200);
     }
 
     public function cetakFaktur($id)

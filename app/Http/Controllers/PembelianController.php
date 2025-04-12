@@ -5,17 +5,26 @@ namespace App\Http\Controllers;
 use App\Models\Item;
 use App\Models\Pembelian;
 use App\Models\PembelianDetail;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Str;
 
 class PembelianController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $pembelians = Pembelian::latest()->paginate(10);
-        return view('pembelian.index', compact('pembelians'));
+        $query = Pembelian::with('pembelianDetails.item')->latest();
+
+        if ($request->has('status') && in_array($request->status, ['LUNAS', 'BELUM LUNAS'])) {
+            $query->where('status', $request->status);
+        }
+
+        $pembelians = $query->paginate(10);
+
+        return view('pembelian.index', data: compact('pembelians'));
     }
 
     /**
@@ -39,8 +48,14 @@ class PembelianController extends Controller
             'items.*.jumlah' => 'required|integer|min:1',
         ]);
 
+        $tanggal = Carbon::now();
+        $prefix = 'F' . $tanggal->format('Ym'); // contoh: F202504
+        $randomCode = strtoupper(Str::random(6)); // contoh: 6 karakter acak
+        $noFaktur = $prefix . '-' . $randomCode;
+
         // Buat transaksi pembelian
         $pembelian = Pembelian::create([
+            'no_faktur' => $noFaktur,
             'nama_supplier' => $request->nama_supplier,
             'tanggal_pembelian' => now(),
             'total_harga' => 0, // Akan di-update setelah menambahkan detail
@@ -116,25 +131,37 @@ class PembelianController extends Controller
 
     public function pelunasan(Request $request, $id)
     {
+        $request->validate([
+            'jumlah_uang' => 'nullable|required_if:metode_pembayaran,CASH|numeric|min:0',
+            'metode_pembayaran' => 'required|in:CASH,KREDIT,CEK,TRANSFER',
+            'kode_cek' => 'required_if:metode_pembayaran,CEK|string|nullable',
+            'tanggal_cair' => 'required_if:metode_pembayaran,CEK|date|nullable',
+        ]);
+
         $pembelian = Pembelian::findOrFail($id);
+        $totalHarga = $pembelian->pembelianDetails->sum('total_harga');
         $jumlahUang = $request->jumlah_uang;
         $metode = $request->metode_pembayaran;
-        $totalHarga = $pembelian->pembelianDetails->sum('total_harga');
 
-        if ($jumlahUang < $totalHarga) {
-            return response()->json(['success' => false, 'message' => 'Jumlah uang kurang!']);
+        if ($metode === 'CASH' && $jumlahUang < $totalHarga) {
+            return response()->json(['success' => false, 'message' => 'Jumlah uang kurang!'], 400);
         }
 
-        $kembalian = $jumlahUang - $totalHarga;
+        $kembalian = ($metode === 'CASH') ? $jumlahUang - $totalHarga : 0;
 
-        // Update status pembelian
         $pembelian->status = 'LUNAS';
         $pembelian->kembalian = $kembalian;
-        $pembelian->total_uang = $jumlahUang;
+        $pembelian->total_uang = $metode === 'CASH' ? $jumlahUang : 0;
         $pembelian->metode = $metode;
-        $pembelian->save(); // Simpan perubahan
 
-        return response()->json(['success' => true, 'message' => 'Pembelian berhasil dilunasi']);
+        if ($metode === 'CEK') {
+            $pembelian->kode_cek = $request->kode_cek;
+            $pembelian->tanggal_cair = $request->tanggal_cair;
+        }
+
+        $pembelian->save();
+
+        return response()->json(['success' => true, 'message' => 'Pembelian berhasil dilunasi'], 200);
     }
 
     public function cetakFaktur($id)

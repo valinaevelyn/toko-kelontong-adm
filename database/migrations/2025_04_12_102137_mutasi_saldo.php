@@ -10,14 +10,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('laporan_kas', function (Blueprint $table) {
+        Schema::create('mutasi_saldo', function (Blueprint $table) {
             $table->id();
-            $table->date('tanggal');
-            $table->string('nama');
-            $table->string('keterangan');
-            $table->integer('kas_masuk')->default(0);
-            $table->integer('kas_keluar')->default(0);
-            $table->integer('saldo')->default(0);
+            $table->enum('dari', ['BANK', 'KAS']);
+            $table->enum('ke', ['BANK', 'KAS']);
+            $table->integer('jumlah');
+            $table->text('catatan')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('laporan_kas');
+        //
     }
 };
