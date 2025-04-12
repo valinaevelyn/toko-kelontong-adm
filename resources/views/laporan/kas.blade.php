@@ -14,22 +14,32 @@
         <!-- Filter berdasarkan bulan -->
         <div class="mb-3 mt-3 text-center">
             <form action="{{ route('laporan.kas') }}" method="GET" class="d-inline-block">
-                <div class="row-md-10 mb-2">
-                    <label for="bulan" class="form-label">PERIODE</label>
-                    <select name="bulan" class="form-select d-inline-block w-auto ms-3" onchange="this.form.submit()">
-                        <option value="ALL" {{ request('bulan') == 'ALL' ? 'selected' : '' }}>ALL</option>
-                        @for ($i = 0; $i < 12; $i++)
-                                            @php
-                                                $date = now()->startOfYear()->addMonths($i);
-                                                $value = $date->format('Y-m');
-                                                $label = $date->translatedFormat('F Y'); // Format nama bulan dalam bahasa lokal
-                                            @endphp
-                                            <option value="{{ $value }}" {{ request('bulan') == $value ? 'selected' : '' }}>
-                                                {{ $label }}
-                                            </option>
-                        @endfor
-                    </select>
+                <div class="row justify-content-center align-items-end">
+                    <div class="col-auto">
+                        <label for="bulan" class="form-label">PERIODE BULAN</label>
+                        <select name="bulan" class="form-select" required>
+                            <option value="ALL" {{ request('bulan') == 'ALL' ? 'selected' : '' }}>ALL</option>
+                            @for ($i = 0; $i < 12; $i++)
+                                                    @php
+                                                        $date = now()->startOfYear()->addMonths($i);
+                                                        $value = $date->format('Y-m');
+                                                        $label = $date->translatedFormat('F Y');
+                                                    @endphp
+                                                    <option value="{{ $value }}" {{ request('bulan') == $value ? 'selected' : '' }}>
+                                                        {{ $label }}
+                                                    </option>
+                            @endfor
+                        </select>
+                    </div>
 
+                    <div class="col-auto">
+                        <label for="tanggal" class="form-label">FILTER TANGGAL (Opsional)</label>
+                        <input type="date" name="tanggal" class="form-control" value="{{ request('tanggal') }}">
+                    </div>
+
+                    <div class="col-auto mt-4">
+                        <button type="submit" class="btn btn-primary">Terapkan Filter</button>
+                    </div>
                 </div>
             </form>
         </div>

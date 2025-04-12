@@ -13,11 +13,10 @@ class LaporanKasController extends Controller
     {
         // Ambil parameter bulan dari request
         $bulan = $request->input('bulan');
+        $tanggalFilter = $request->input('tanggal');
 
-
-        // Jika filter bulan dipilih, buat variabel filter
         if (!empty($bulan) && $bulan !== 'ALL') {
-            $date = Carbon::createFromFormat('Y-m-d', $bulan . '-01');
+            $date = Carbon::createFromFormat('Y-m', $bulan);
             $year = $date->year;
             $month = $date->month;
         } else {
@@ -33,6 +32,10 @@ class LaporanKasController extends Controller
             $laporanKasUtama = $laporanKasUtama
                 ->whereYear('tanggal', $year)
                 ->whereMonth('tanggal', $month);
+        }
+
+        if (!empty($tanggalFilter)) {
+            $laporanKasUtama = $laporanKasUtama->whereDate('tanggal', $tanggalFilter);
         }
 
 
@@ -53,6 +56,10 @@ class LaporanKasController extends Controller
                 ->whereMonth('tanggal_penjualan', $month);
         }
 
+        if (!empty($tanggalFilter)) {
+            $penjualanLunas = $penjualanLunas->whereDate('tanggal_penjualan', $tanggalFilter);
+        }
+
         // Query transaksi pembelian yang sudah lunas (sebagai kas_keluar)
         $pembelianLunas = DB::table('pembelians')
             ->where('status', 'LUNAS')
@@ -70,13 +77,16 @@ class LaporanKasController extends Controller
                 ->whereMonth('tanggal_pembelian', $month);
         }
 
+        if (!empty($tanggalFilter)) {
+            $pembelianLunas = $pembelianLunas->whereDate('tanggal_pembelian', $tanggalFilter);
+        }
         // Gabungkan semua transaksi menggunakan union
         $laporanKas = $laporanKasUtama->union($penjualanLunas)->union($pembelianLunas);
 
         // Ambil data dan urutkan berdasarkan tanggal
         $laporanKas = $laporanKas->orderBy('tanggal')->get();
 
-        return view('laporan.kas', compact('laporanKas', 'bulan'));
+        return view('laporan.kas', compact('laporanKas', 'bulan', 'tanggalFilter'));
     }
 
     public function storeBiaya(Request $request)
