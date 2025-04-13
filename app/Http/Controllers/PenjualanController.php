@@ -7,6 +7,7 @@ use App\Models\Penjualan;
 use App\Models\PenjualanDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Validator;
 use Str;
 
 class PenjualanController extends Controller
@@ -114,7 +115,8 @@ class PenjualanController extends Controller
      */
     public function edit(Penjualan $penjualan)
     {
-        //
+        $items = Item::all()->where('stock', '>', 0);
+        return view('penjualan.edit', compact('penjualan', 'items'));
     }
 
     /**
@@ -122,7 +124,66 @@ class PenjualanController extends Controller
      */
     public function update(Request $request, Penjualan $penjualan)
     {
-        //
+        $rules = [
+            'nama_pembeli' => 'required|string',
+            'items' => 'required|array',
+            'items.*.id' => 'required|exists:items,id',
+            'items.*.jumlah' => 'required|integer|min:1',
+        ];
+
+        $message = [
+            'required' => ':attribute harus diisi',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $message);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withInput()->withErrors($validator)
+                ->with('danger', 'Pastikan semua field terisi');
+        } else {
+            // Hapus detail penjualan yang ada
+            foreach ($penjualan->penjualanDetails as $detail) {
+                $item = Item::find($detail->item_id);
+                $item->increment('stock', $detail->jumlah);
+                $detail->delete();
+            }
+
+            // Tambahkan detail item baru
+            $totalHarga = 0;
+            $totalItem = 0;
+
+            foreach ($request->items as $item) {
+                $itemData = Item::find($item['id']);
+
+                if ($itemData->stock < $item['jumlah']) {
+                    return redirect()->route('penjualan.edit', $penjualan)->with('error', 'Stok item tidak mencukupi!');
+                }
+
+                $subtotal = $item['jumlah'] * $itemData->harga_jual;
+
+                PenjualanDetail::create([
+                    'penjualan_id' => $penjualan->id,
+                    'item_id' => $item['id'],
+                    'jumlah' => $item['jumlah'],
+                    'total_harga' => $subtotal,
+                ]);
+
+                // Kurangi stok item
+                $itemData->decrement('stock', $item['jumlah']);
+                $totalHarga += $subtotal;
+                $totalItem += $item['jumlah'];
+            }
+
+            // Update total harga penjualan
+            $penjualan->update([
+                'nama_pembeli' => $request->nama_pembeli,
+                'total_harga_akhir' => $totalHarga,
+                'total_item' => $totalItem,
+            ]);
+
+            return redirect()->route('penjualan.index')->with('success', 'Penjualan berhasil diperbarui!');
+        }
     }
 
     /**

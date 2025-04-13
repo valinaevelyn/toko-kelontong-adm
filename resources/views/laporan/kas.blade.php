@@ -70,6 +70,20 @@
             </table>
         </div>
 
+        <div class="mt-4">
+            <h5 class="text-center">Saldo Akhir</h5>
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <table class="table table-bordered">
+                        <tr>
+                            <th>Saldo Akhir</th>
+                            <td class="text-end fw-bold">Rp {{ number_format($saldoAkhir, 0, ',', '.') }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Modal -->
         <div class="modal fade" id="inputBiayaModal" tabindex="-1" aria-labelledby="inputBiayaModalLabel"
             aria-hidden="true">

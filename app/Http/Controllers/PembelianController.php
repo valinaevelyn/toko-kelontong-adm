@@ -6,6 +6,7 @@ use App\Models\Item;
 use App\Models\Pembelian;
 use App\Models\PembelianDetail;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Str;
 
@@ -110,7 +111,8 @@ class PembelianController extends Controller
      */
     public function edit(Pembelian $pembelian)
     {
-        //
+        $items = Item::all();
+        return view('pembelian.edit', compact('pembelian', 'items'));
     }
 
     /**
@@ -118,7 +120,60 @@ class PembelianController extends Controller
      */
     public function update(Request $request, Pembelian $pembelian)
     {
-        //
+        $rules = [
+            'nama_supplier' => 'required|string',
+            'items' => 'required|array',
+            'items.*.id' => 'required|exists:items,id',
+            'items.*.jumlah' => 'required|integer|min:1',
+        ];
+
+        $message = [
+            'required' => ':attribute tidak boleh kosong',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $message);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withInput()->withErrors($validator)
+                ->with('danger', 'Pastikan semua field terisi');
+        } else {
+            // Hapus detail penjualan yang ada
+            foreach ($pembelian->pembelianDetails as $detail) {
+                $item = Item::find($detail->item_id);
+                $item->increment('stock', $detail->jumlah);
+                $detail->delete();
+            }
+
+            // Tambahkan detail item baru
+            $totalHarga = 0;
+            $totalItem = 0;
+
+            foreach ($request->items as $item) {
+                $itemData = Item::find($item['id']);
+
+                $subtotal = $item['jumlah'] * $itemData->harga_beli;
+
+                PembelianDetail::create([
+                    'pembelian_id' => $pembelian->id,
+                    'item_id' => $item['id'],
+                    'jumlah' => $item['jumlah'],
+                    'total_harga' => $subtotal,
+                ]);
+
+                // Tambah stok item
+                $itemData->increment('stock', $item['jumlah']);
+                $totalHarga += $subtotal;
+                $totalItem += $item['jumlah'];
+            }
+            // Update total harga pembelian
+            $pembelian->update([
+                'total_harga' => $totalHarga,
+                'total_item' => $totalItem,
+                'nama_supplier' => $request->nama_supplier,
+            ]);
+            return redirect()->route('pembelian.index')->with('success', 'Pembelian berhasil diperbarui!');
+        }
     }
 
     /**

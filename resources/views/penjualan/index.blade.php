@@ -94,6 +94,8 @@
                                                         target="_blank">Cetak Faktur</a></li>
                                             @endif
 
+                                            <li><a class="dropdown-item" href="{{ route('penjualan.edit', $penjualan->id) }}">Edit
+                                                    Penjualan</a></li>
                                         </ul>
                                     </div>
                                 </td>

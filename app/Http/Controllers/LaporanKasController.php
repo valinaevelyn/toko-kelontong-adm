@@ -86,7 +86,11 @@ class LaporanKasController extends Controller
         // Ambil data dan urutkan berdasarkan tanggal
         $laporanKas = $laporanKas->orderBy('tanggal')->get();
 
-        return view('laporan.kas', compact('laporanKas', 'bulan', 'tanggalFilter'));
+        $totalKasMasuk = $laporanKas->sum('kas_masuk');
+        $totalKasKeluar = $laporanKas->sum('kas_keluar');
+        $saldoAkhir = $totalKasMasuk - $totalKasKeluar;
+
+        return view('laporan.kas', compact('laporanKas', 'bulan', 'tanggalFilter', 'totalKasMasuk', 'totalKasKeluar', 'saldoAkhir'));
     }
 
     public function storeBiaya(Request $request)

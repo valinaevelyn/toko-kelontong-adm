@@ -88,6 +88,9 @@
                                                 <li><a class="dropdown-item" href="{{ route('pembelian.faktur', $pembelian->id) }}"
                                                         target="_blank">Cetak Faktur</a></li>
                                             @endif
+
+                                            <li><a class="dropdown-item" href="{{ route('pembelian.edit', $pembelian->id) }}">Edit
+                                                    Pembelian</a></li>
                                         </ul>
                                     </div>
                                 </td>
