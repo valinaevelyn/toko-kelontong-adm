@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LaporanKasController;
+use App\Http\Controllers\LaporanPiutangController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PembelianController;
 use App\Http\Controllers\PenjualanController;
@@ -28,4 +29,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/laporan-kas/biaya', [LaporanKasController::class, 'storeBiaya'])->name('laporan.kas.biaya');
 
     Route::post('/dashboard/transfer-saldo', [DashboardController::class, 'transferSaldo'])->name('dashboard.transferSaldo');
+
+    Route::get('/laporan-piutang', [LaporanPiutangController::class, 'index'])->name('laporan.piutang');
+    Route::post('/laporan-piutang/biaya', [LaporanPiutangController::class, 'storePiutang'])->name('laporan.piutang.biaya');
 });

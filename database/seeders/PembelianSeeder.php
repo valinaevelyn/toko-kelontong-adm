@@ -17,7 +17,7 @@ class PembelianSeeder extends Seeder
     public function run(): void
     {
         $faker = Faker::create('id_ID');
-        for ($i = 1; $i <= 20; $i++) {
+        for ($i = 1; $i <= 50; $i++) {
             $tanggal = Carbon::now();
             $prefix = 'F' . $tanggal->format('Ym'); // contoh: F202504
             $randomCode = strtoupper(Str::random(6)); // contoh: 6 karakter acak

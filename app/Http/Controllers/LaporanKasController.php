@@ -120,4 +120,5 @@ class LaporanKasController extends Controller
         return redirect()->route('laporan.kas')->with('success', 'Biaya berhasil ditambahkan!');
     }
 
+
 }

@@ -140,7 +140,7 @@
                                 <input type="text" class="form-control" id="kode_cek">
                             </div>
                             <div class="mb-3" id="cek-fields-date">
-                                <label class="form-label">Tanggal Cair</label>
+                                <label class="form-label">Tanggal Cair Cek</label>
                                 <input type="date" class="form-control" id="tanggal_cair">
                             </div>
 

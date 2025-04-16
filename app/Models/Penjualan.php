@@ -26,4 +26,9 @@ class Penjualan extends Model
         $this->save();
     }
 
+    public function laporanPiutang()
+    {
+        return $this->hasOne(LaporanPiutang::class);
+    }
+
 }

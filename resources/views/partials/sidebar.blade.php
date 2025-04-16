@@ -40,7 +40,14 @@
                     <a class="nav-link d-flex align-items-center gap-2 text-white p-3 @yield('reportActive')"
                         href="/laporan-kas">
                         <i class="bi bi-bar-chart-line"></i>
-                        Reports
+                        Laporan Kas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center gap-2 text-white p-3 @yield('reportActive')"
+                        href="/laporan-piutang">
+                        <i class="bi bi-bar-chart-line"></i>
+                        Laporan Piutang
                     </a>
                 </li>
             </ul>

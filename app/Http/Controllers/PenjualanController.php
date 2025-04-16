@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
+use App\Models\LaporanPiutang;
 use App\Models\Penjualan;
 use App\Models\PenjualanDetail;
 use Illuminate\Http\Request;
@@ -224,7 +225,20 @@ class PenjualanController extends Controller
             $penjualan->tanggal_cair = $request->tanggal_cair;
         }
 
+        // Simpan perubahan di penjualan
         $penjualan->save();
+
+        // Update status_terlambat di laporan piutang berdasarkan id penjualan
+        if ($penjualan->tanggal_cair) {
+            // Cari laporan piutang yang terkait dengan penjualan berdasarkan id
+            $laporanPiutang = LaporanPiutang::where('penjualan_id', $penjualan->id)->first();
+
+            if ($laporanPiutang) {
+                // Jika ada, update status_terlambat menjadi "Sudah lunas"
+                $laporanPiutang->status_terlambat = 'Sudah lunas';
+                $laporanPiutang->save();
+            }
+        }
 
         return response()->json(['success' => true, 'message' => 'Penjualan berhasil dilunasi'], 200);
     }

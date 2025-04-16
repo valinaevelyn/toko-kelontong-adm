@@ -138,14 +138,12 @@ class PembelianController extends Controller
                 ->withInput()->withErrors($validator)
                 ->with('danger', 'Pastikan semua field terisi');
         } else {
-            // Hapus detail penjualan yang ada
             foreach ($pembelian->pembelianDetails as $detail) {
                 $item = Item::find($detail->item_id);
                 $item->increment('stock', $detail->jumlah);
                 $detail->delete();
             }
 
-            // Tambahkan detail item baru
             $totalHarga = 0;
             $totalItem = 0;
 
