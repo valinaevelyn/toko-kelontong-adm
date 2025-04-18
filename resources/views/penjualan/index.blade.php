@@ -119,8 +119,11 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="pelunasanForm">
+                        <form id="pelunasanForm" method="POST" action="{{ route('penjualan.pelunasan', $penjualan->id) }}">
+                            {{-- CSRF Token untuk keamanan --}}
                             @csrf
+                            @method('PUT')
+                            {{-- Input hidden untuk menyimpan ID penjualan --}}
                             <input type="hidden" id="penjualan_id">
                             <div class="mb-3">
                                 <label class="form-label">Metode Pembayaran</label>
@@ -148,6 +151,14 @@
                             <div class="mb-3" id="cek-fields-date">
                                 <label class="form-label">Tanggal Cair Cek</label>
                                 <input type="date" class="form-control" id="tanggal_cair">
+                            </div>
+
+                            <div class="mb-3" id="status_saldo_group" style="display: none;">
+                                <label class="form-label">Status Saldo</label>
+                                <select class="form-control" id="status_saldo" name="status_saldo">
+                                    <option value="LUNAS">Lunas</option>
+                                    <option value="BELUM LUNAS">Belum Lunas</option>
+                                </select>
                             </div>
 
                             <button type="submit" class="btn btn-primary">Konfirmasi</button>
@@ -236,14 +247,22 @@
                 document.getElementById("jumlah_uang_group").style.display = 'block'; // tampilkan input jumlah uang
                 document.getElementById("cek-fields-code").style.display = 'none';
                 document.getElementById("cek-fields-date").style.display = 'none';
+                document.getElementById("status_saldo_group").style.display = 'none';
             } else if (metode === 'CEK') {
                 document.getElementById("jumlah_uang_group").style.display = 'none'; // sembunyikan input jumlah uang
                 document.getElementById("cek-fields-code").style.display = 'block'; // tampilkan input cek
                 document.getElementById("cek-fields-date").style.display = 'block'; // tampilkan input cek
+                document.getElementById("status_saldo_group").style.display = 'block';
+            } else if (metode === 'KREDIT') {
+                document.getElementById("jumlah_uang_group").style.display = 'none'; // sembunyikan input jumlah uang
+                document.getElementById("cek-fields-code").style.display = 'none';
+                document.getElementById("cek-fields-date").style.display = 'none';
+                document.getElementById("status_saldo_group").style.display = 'block';
             } else {
                 document.getElementById("jumlah_uang_group").style.display = 'none'; // sembunyikan input jumlah uang
                 document.getElementById("cek-fields-code").style.display = 'none';
                 document.getElementById("cek-fields-date").style.display = 'none';
+                document.getElementById("status_saldo_group").style.display = 'none';
             }
         });
 
@@ -265,6 +284,12 @@
                 document.getElementById("cek-fields-code").style.display = 'none';
                 document.getElementById("cek-fields-date").style.display = 'none';
             }
+
+            if (metode === 'KREDIT' || metode === 'CEK') {
+                document.getElementById("status_saldo_group").style.display = 'block';
+            } else {
+                document.getElementById("status_saldo_group").style.display = 'none';
+            }
         }
 
         // Panggil function applyPaymentMethodRule saat halaman pertama kali dibuka
@@ -279,6 +304,7 @@
             let metodePembayaran = document.getElementById("metode_pembayaran").value;
             let kodeCek = document.getElementById("kode_cek").value;
             let tanggalCair = document.getElementById("tanggal_cair").value;
+            let statusSaldo = document.getElementById("status_saldo").value;
 
             let csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
 
@@ -286,7 +312,8 @@
                 jumlah_uang: jumlahUang,
                 metode_pembayaran: metodePembayaran,
                 kode_cek: kodeCek,
-                tanggal_cair: tanggalCair
+                tanggal_cair: tanggalCair,
+                status_saldo: statusSaldo
             };
 
             fetch(`/penjualan/pelunasan/${penjualanId}`, {

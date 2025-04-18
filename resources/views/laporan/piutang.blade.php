@@ -45,6 +45,7 @@
                     <tr>
                         <th>TANGGAL</th>
                         <th>NAMA</th>
+                        <th>KETERANGAN</th>
                         <th>PIUTANG</th>
                         <th>TANGGAL JATUH TEMPO</th>
                         <th>STATUS TERLAMBAT (Hari)</th>
@@ -55,6 +56,7 @@
                         <tr>
                             <td>{{ $item->tanggal }}</td>
                             <td>{{ $item->nama }}</td>
+                            <td>{{ $item->keterangan }}</td>
                             <td>{{ 'Rp ' . number_format($item->jumlah_piutang, 0, ',', '.') }}</td>
                             <td>{{ $item->jatuh_tempo }}</td>
                             <td>

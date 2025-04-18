@@ -36,23 +36,38 @@
                         Pembelian
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2 text-white p-3 @yield('reportActive')"
-                        href="/laporan-kas">
-                        <i class="bi bi-bar-chart-line"></i>
-                        Laporan Kas
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link d-flex align-items-center gap-2 text-white p-3 @yield('reportActive')"
-                        href="/laporan-piutang">
-                        <i class="bi bi-bar-chart-line"></i>
-                        Laporan Piutang
-                    </a>
-                </li>
+
             </ul>
 
             <hr class="my-3 border-light">
+
+            @can('supervisor')
+                <ul class="nav flex-column mb-auto">
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center gap-2 text-white p-3 @yield('reportActive')"
+                            href="/laporan-kas">
+                            <i class="bi bi-bar-chart-line"></i>
+                            Laporan Kas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center gap-2 text-white p-3 @yield('reportActive')"
+                            href="/laporan-bank">
+                            <i class="bi bi-bar-chart-line"></i>
+                            Laporan Bank
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center gap-2 text-white p-3 @yield('reportActive')"
+                            href="/laporan-piutang">
+                            <i class="bi bi-bar-chart-line"></i>
+                            Laporan Piutang
+                        </a>
+                    </li>
+                </ul>
+
+                <hr class="my-3 border-light">
+            @endcan
 
             <ul class="nav flex-column mb-auto">
                 {{-- <li class="nav-item">

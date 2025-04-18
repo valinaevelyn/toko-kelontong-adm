@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\LaporanPiutang;
 use App\Models\Pembelian;
 use App\Models\Penjualan;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -26,16 +27,19 @@ class LaporanPiutangController extends Controller
         }
 
         // Query untuk laporan piutang, hanya dari penjualan
-        $laporanPiutang = Penjualan::whereIn('metode', ['CEK', 'KREDIT'])
-            ->select(
-                'tanggal_penjualan as tanggal',
-                'nama_pembeli as nama',
-                'total_harga_akhir as jumlah_piutang',
-                'kode_cek',
-                'status',
-                'tanggal_cair'
-            )
-            ->whereNull('tanggal_cair');  // Piutang yang belum dibayar
+        $laporanPiutang =
+            Penjualan::whereIn('metode', ['CEK', 'KREDIT'])
+                ->where('status', 'BELUM LUNAS')
+                ->select(
+                    'tanggal_penjualan as tanggal',
+                    'nama_pembeli as nama',
+                    DB::raw("CASE metode WHEN 'KREDIT' THEN 'KREDIT' WHEN 'CEK' THEN 'CEK' ELSE 'LAINNYA' END as keterangan"),
+                    'total_harga_akhir as jumlah_piutang',
+                    'kode_cek',
+                    'status',
+                    'tanggal_cair'
+                )
+                ->whereNull('tanggal_cair');  // Piutang yang belum dibayar
 
         if ($year && $month) {
             $laporanPiutang = $laporanPiutang->whereYear('tanggal_penjualan', $year)
@@ -89,6 +93,7 @@ class LaporanPiutangController extends Controller
 
         // Tanggal cair adalah tanggal cek diterbitkan
         $tanggalCair = $request->tanggal_cair; // Misalnya tanggal cair yang dikirim di form
+
 
         LaporanPiutang::create([
             'tanggal' => $request->tanggal,

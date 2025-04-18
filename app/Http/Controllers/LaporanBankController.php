@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\LaporanKas;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\LaporanBank;
 use Carbon\Carbon;
+use DB;
+use Illuminate\Http\Request;
 
-class LaporanKasController extends Controller
+class LaporanBankController extends Controller
 {
     public function index(Request $request)
     {
@@ -24,30 +24,27 @@ class LaporanKasController extends Controller
             $month = null;
         }
 
-        // Query dasar untuk laporan kas utama
-        $laporanKasUtama = DB::table('laporan_kas')
-            ->select('tanggal', 'nama', 'kas_masuk', 'kas_keluar', 'keterangan');
+        $laporanBankUtama = DB::table('laporan_banks')
+            ->select('tanggal', 'nama', 'bank_masuk', 'bank_keluar', 'keterangan');
 
         if ($year && $month) {
-            $laporanKasUtama = $laporanKasUtama
+            $laporanBankUtama = $laporanBankUtama
                 ->whereYear('tanggal', $year)
                 ->whereMonth('tanggal', $month);
         }
 
         if (!empty($tanggalFilter)) {
-            $laporanKasUtama = $laporanKasUtama->whereDate('tanggal', $tanggalFilter);
+            $laporanBankUtama = $laporanBankUtama->whereDate('tanggal', $tanggalFilter);
         }
 
-
-        // Query transaksi penjualan yang sudah lunas (sebagai kas_masuk)
         $penjualanLunas = DB::table('penjualans')
             ->where('status', 'LUNAS')
-            ->where('metode', 'CASH')
+            ->where('metode', 'TRANSFER')
             ->select(
                 'tanggal_penjualan as tanggal',
                 'nama_pembeli as nama',
-                'total_harga_akhir as kas_masuk',
-                DB::raw('NULL as kas_keluar'),
+                'total_harga_akhir as bank_masuk',
+                DB::raw('NULL as bank_keluar'),
                 DB::raw("'Penjualan' as keterangan")
             );
 
@@ -61,15 +58,15 @@ class LaporanKasController extends Controller
             $penjualanLunas = $penjualanLunas->whereDate('tanggal_penjualan', $tanggalFilter);
         }
 
-        // Query transaksi pembelian yang sudah lunas (sebagai kas_keluar)
+        // Query transaksi pembelian yang sudah lunas (sebagai bank_keluar)
         $pembelianLunas = DB::table('pembelians')
             ->where('status', 'LUNAS')
-            ->where('metode', 'CASH')
+            ->where('metode', 'TRANSFER')
             ->select(
                 'tanggal_pembelian as tanggal',
                 'nama_supplier as nama',
-                DB::raw('NULL as kas_masuk'),
-                'total_harga as kas_keluar',
+                DB::raw('NULL as bank_masuk'),
+                'total_harga as bank_keluar',
                 DB::raw("'Pembelian' as keterangan")
             );
 
@@ -83,16 +80,16 @@ class LaporanKasController extends Controller
             $pembelianLunas = $pembelianLunas->whereDate('tanggal_pembelian', $tanggalFilter);
         }
         // Gabungkan semua transaksi menggunakan union
-        $laporanKas = $laporanKasUtama->union($penjualanLunas)->union($pembelianLunas);
+        $laporanBank = $laporanBankUtama->union($penjualanLunas)->union($pembelianLunas);
 
         // Ambil data dan urutkan berdasarkan tanggal
-        $laporanKas = $laporanKas->orderBy('tanggal')->get();
+        $laporanBank = $laporanBank->orderBy('tanggal')->get();
 
-        $totalKasMasuk = $laporanKas->sum('kas_masuk');
-        $totalKasKeluar = $laporanKas->sum('kas_keluar');
-        $saldoAkhir = $totalKasMasuk - $totalKasKeluar;
+        $totalBankMasuk = $laporanBank->sum('bank_masuk');
+        $totalBankKeluar = $laporanBank->sum('bank_keluar');
+        $saldoAkhir = $totalBankMasuk - $totalBankKeluar;
 
-        return view('laporan.kas', compact('laporanKas', 'bulan', 'tanggalFilter', 'totalKasMasuk', 'totalKasKeluar', 'saldoAkhir'));
+        return view('laporan.bank', compact('laporanBank', 'bulan', 'tanggalFilter', 'totalBankMasuk', 'totalBankKeluar', 'saldoAkhir'));
     }
 
     public function storeBiaya(Request $request)
@@ -101,26 +98,25 @@ class LaporanKasController extends Controller
             'tanggal' => 'required|date',
             'nama' => 'required|string',
             'keterangan' => 'required|string',
-            'kas_masuk' => 'nullable|integer',
-            'kas_keluar' => 'nullable|integer',
+            'bank_masuk' => 'nullable|integer',
+            'bank_keluar' => 'nullable|integer',
         ]);
 
-        $saldoTerakhir = LaporanKas::orderBy('tanggal', 'desc')->first()->saldo ?? 0;
-        $kasMasuk = $request->kas_masuk ?? 0;
-        $kasKeluar = $request->kas_keluar ?? 0;
-        $saldoBaru = $saldoTerakhir + $kasMasuk - $kasKeluar;
+        $saldoTerakhir = LaporanBank::orderBy('tanggal', 'desc')->first()->saldo ?? 0;
+        $bankMasuk = $request->bank_masuk ?? 0;
+        $bankKeluar = $request->bank_keluar ?? 0;
+        $saldoBaru = $saldoTerakhir + $bankMasuk - $bankKeluar;
 
-        LaporanKas::create([
+        LaporanBank::create([
             'tanggal' => $request->tanggal,
             'nama' => $request->nama,
             'keterangan' => $request->keterangan,
-            'kas_masuk' => $kasMasuk,
-            'kas_keluar' => $kasKeluar,
+            'bank_masuk' => $bankMasuk,
+            'bank_keluar' => $bankKeluar,
             'saldo' => $saldoBaru,
         ]);
 
-        return redirect()->route('laporan.kas')->with('success', 'Biaya berhasil ditambahkan!');
+        return redirect()->route('laporan.bank')->with('success', 'Biaya berhasil ditambahkan!');
     }
-
 
 }

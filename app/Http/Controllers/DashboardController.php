@@ -15,24 +15,30 @@ class DashboardController extends Controller
         $total_pengeluaran = Pembelian::sum('total_harga');
         $keuntungan_bersih = $total_pendapatan - $total_pengeluaran;
 
-        // Saldo awal dari penjualan
-        $penjualan_kas = Penjualan::where('metode', 'CASH')->sum('total_harga_akhir');
-        $penjualan_bank = Penjualan::where('metode', 'TRANSFER')->sum('total_harga_akhir');
+        // Penjualan berdasarkan metode
+        $penjualan_kas = Penjualan::where('metode', 'CASH')->where('status', 'LUNAS')->sum('total_harga_akhir');
+        $penjualan_bank = Penjualan::where('metode', 'TRANSFER')->where('status', 'LUNAS')->sum('total_harga_akhir');
 
-        // Hitung mutasi saldo
+        // Pengeluaran berdasarkan metode (pembelian)
+        $pembelian_kas = Pembelian::where('metode', 'CASH')->where('status', 'LUNAS')->sum('total_harga');
+        $pembelian_bank = Pembelian::where('metode', 'TRANSFER')->where('status', 'LUNAS')->sum('total_harga');
+        $pembelian_piutang = Pembelian::whereNotIn('metode', ['CASH', 'TRANSFER'])->where('status', 'BELUM LUNAS')->sum('total_harga');
+
+        // Mutasi saldo
         $mutasi_dari_kas = DB::table('mutasi_saldo')->where('dari', 'KAS')->sum('jumlah');
         $mutasi_ke_kas = DB::table('mutasi_saldo')->where('ke', 'KAS')->sum('jumlah');
         $mutasi_dari_bank = DB::table('mutasi_saldo')->where('dari', 'BANK')->sum('jumlah');
         $mutasi_ke_bank = DB::table('mutasi_saldo')->where('ke', 'BANK')->sum('jumlah');
 
-        // Saldo akhir
-        $saldo_kas = $penjualan_kas - $mutasi_dari_kas + $mutasi_ke_kas;
-        $saldo_bank = $penjualan_bank - $mutasi_dari_bank + $mutasi_ke_bank;
+        // Saldo akhir setelah dikurangi pembelian
+        $saldo_kas = $penjualan_kas - $mutasi_dari_kas + $mutasi_ke_kas - $pembelian_kas;
+        $saldo_bank = $penjualan_bank - $mutasi_dari_bank + $mutasi_ke_bank - $pembelian_bank;
 
-        // Piutang = selain CASH dan TRANSFER
-        $saldo_piutang = Penjualan::whereNotIn('metode', ['CASH', 'TRANSFER'])->sum('total_harga_akhir');
+        // Piutang = selain CASH dan TRANSFER (penjualan dan pembelian)
+        $piutang_penjualan = Penjualan::whereNotIn('metode', ['CASH', 'TRANSFER'])->where('status', 'BELUM LUNAS')->sum('total_harga_akhir');
+        $saldo_piutang = $piutang_penjualan - $pembelian_piutang;
 
-        // Transaksi terbaru (penjualan + pembelian)
+        // Transaksi terbaru
         $transaksi_terbaru = DB::table(function ($query) {
             $query->select(
                 'tanggal_penjualan as tanggal',
@@ -80,10 +86,10 @@ class DashboardController extends Controller
         $jumlah = $request->jumlah;
 
         $saldo_asal = $asal === 'BANK'
-            ? Penjualan::where('metode', 'TRANSFER')->sum('total_harga_akhir')
+            ? Penjualan::where('metode', 'TRANSFER')->where('status', 'LUNAS')->sum('total_harga_akhir')
             - DB::table('mutasi_saldo')->where('dari', 'BANK')->sum('jumlah')
             + DB::table('mutasi_saldo')->where('ke', 'BANK')->sum('jumlah')
-            : Penjualan::where('metode', 'CASH')->sum('total_harga_akhir')
+            : Penjualan::where('metode', 'CASH')->where('status', 'LUNAS')->sum('total_harga_akhir')
             - DB::table('mutasi_saldo')->where('dari', 'KAS')->sum('jumlah')
             + DB::table('mutasi_saldo')->where('ke', 'KAS')->sum('jumlah');
 

@@ -17,17 +17,18 @@ class UserSeeder extends Seeder
         $faker = Faker::create('id_ID');
 
         User::create([
-            'name' => 'User 1',
-            'email' => 'user@gmail.com',
-            'password' => 'password'
+            'name' => 'Admin',
+            'email' => 'admin@gmail.com',
+            'password' => 'password',
+            'role' => 'admin'
         ]);
 
-        for ($i = 1; $i <= 3; $i++) {
-            User::create([
-                'name' => $faker->name,
-                'email' => $faker->email,
-                'password' => 'password'
-            ]);
-        }
+
+        User::create([
+            'name' => 'Supervisor',
+            'email' => 'supervisor@gmail.com',
+            'password' => 'password',
+            'role' => 'supervisor'
+        ]);
     }
 }

@@ -197,13 +197,6 @@ class PenjualanController extends Controller
 
     public function pelunasan(Request $request, $id)
     {
-        $request->validate([
-            'jumlah_uang' => 'nullable|required_if:metode_pembayaran,CASH|numeric|min:0',
-            'metode_pembayaran' => 'required|in:CASH,KREDIT,CEK,TRANSFER',
-            'kode_cek' => 'required_if:metode_pembayaran,CEK|string|nullable',
-            'tanggal_cair' => 'required_if:metode_pembayaran,CEK|date|nullable',
-        ]);
-
         $penjualan = Penjualan::findOrFail($id);
         $totalHarga = $penjualan->penjualanDetails->sum('total_harga');
         $jumlahUang = $request->jumlah_uang;
@@ -215,32 +208,43 @@ class PenjualanController extends Controller
 
         $kembalian = ($metode == 'CASH') ? $jumlahUang - $totalHarga : 0;
 
-        $penjualan->status = 'LUNAS';
+        // Set sesuai metode
+        if ($metode == 'CASH') {
+            $penjualan->total_uang = $jumlahUang;
+            $penjualan->status = 'LUNAS';
+        }
+
         $penjualan->kembalian = $kembalian;
-        $penjualan->total_uang = $metode == 'CASH' ? $jumlahUang : 0;
         $penjualan->metode = $metode;
+
+        if ($metode == 'TRANSFER') {
+            $penjualan->status = 'LUNAS';
+        }
 
         if ($metode == 'CEK') {
             $penjualan->kode_cek = $request->kode_cek;
             $penjualan->tanggal_cair = $request->tanggal_cair;
+            $penjualan->status = $request->status_saldo;
         }
 
-        // Simpan perubahan di penjualan
+        if ($metode == 'KREDIT') {
+            $penjualan->status = $request->status_saldo;
+        }
+
         $penjualan->save();
 
-        // Update status_terlambat di laporan piutang berdasarkan id penjualan
+        // Update laporan piutang jika tanggal cair tersedia
         if ($penjualan->tanggal_cair) {
-            // Cari laporan piutang yang terkait dengan penjualan berdasarkan id
             $laporanPiutang = LaporanPiutang::where('penjualan_id', $penjualan->id)->first();
 
             if ($laporanPiutang) {
-                // Jika ada, update status_terlambat menjadi "Sudah lunas"
                 $laporanPiutang->status_terlambat = 'Sudah lunas';
                 $laporanPiutang->save();
             }
         }
 
-        return response()->json(['success' => true, 'message' => 'Penjualan berhasil dilunasi'], 200);
+        return response()->json(['success' => true, 'message' => 'Berhasil'], 200);
+
     }
 
     public function cetakFaktur($id)
