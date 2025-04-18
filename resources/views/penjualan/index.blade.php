@@ -170,8 +170,6 @@
 
 
 
-
-
         <div class="d-flex justify-content-end">
             {{ $penjualans->appends(['status' => request('status')])->links() }}
         </div>
