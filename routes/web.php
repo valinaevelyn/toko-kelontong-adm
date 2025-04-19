@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LaporanBankController;
+use App\Http\Controllers\LaporanItemController;
 use App\Http\Controllers\LaporanKasController;
 use App\Http\Controllers\LaporanPiutangController;
 use App\Http\Controllers\LaporanUtangController;
@@ -46,4 +47,6 @@ Route::middleware(['supervisor'])->group(function () {
 
     Route::get('/laporan-utang', [LaporanUtangController::class, 'index'])->name('laporan.utang');
     Route::post('/laporan-utang/biaya', [LaporanUtangController::class, 'storeUtang'])->name('laporan.utang.biaya');
+
+    Route::get('/laporan-item', [LaporanItemController::class, 'laporanHistori'])->name('laporan.item');
 });

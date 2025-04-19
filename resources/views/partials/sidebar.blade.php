@@ -71,6 +71,13 @@
                             Laporan Utang
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center gap-2 text-white p-3 @yield('reportActive')"
+                            href="/laporan-item">
+                            <i class="bi bi-bar-chart-line"></i>
+                            Laporan Item
+                        </a>
+                    </li>
                 </ul>
 
                 <hr class="my-3 border-light">
