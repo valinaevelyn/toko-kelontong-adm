@@ -29,18 +29,25 @@
                 <tbody>
                     @php $totalHarga = 0; @endphp
                     @foreach ($pembelian->pembelianDetails as $detail)
-                        @php $subtotal = $detail->jumlah * $detail->item->harga_beli; @endphp
-                        @php $totalHarga += $subtotal; @endphp
-                        <tr class="table">
-                            <td>{{ $detail->item->nama }}</td>
-                            <td>{{ $detail->jumlah }}</td>
-                            <td>{{ 'Rp ' . number_format($detail->item->harga_beli, 0, ',', '.') }}</td>
-                            <td>{{ 'Rp ' . number_format($subtotal, 0, ',', '.') }}</td>
-                        </tr>
+                                    @php
+                                        $subtotal = $detail->total_harga;
+                                        $totalHarga += $subtotal;
+                                    @endphp
+                                    <tr class="table">
+                                        <td>{{ $detail->item->nama }}</td>
+                                        <td>
+                                            @if($detail->jumlah_dus) <strong>{{ $detail->jumlah_dus }} dus</strong><br> @endif
+                                            @if($detail->jumlah_rcg) <strong>{{ $detail->jumlah_rcg }} renceng</strong><br> @endif
+                                            @if($detail->jumlah_pcs) <strong>{{ $detail->jumlah_pcs }} pcs</strong> @endif
+                                        </td>
+                                        <td>{{ 'Rp ' . number_format($detail->harga_satuan, 0, ',', '.') }}</td>
+                                        <td>{{ 'Rp ' . number_format(($detail->jumlah_dus * $detail->item->dus_in_pcs * $detail->harga_satuan) + ($detail->jumlah_rcg * $detail->item->rcg_in_pcs * $detail->harga_satuan) + (($detail->jumlah_pcs * $detail->harga_satuan)), 0, ',', '.') }}
+                                        </td>
+                                    </tr>
                     @endforeach
                     <tr class="table">
                         <td colspan="3">Total Harga</td>
-                        <td><strong>{{ 'Rp ' . number_format($totalHarga, 0, ',', '.') }}</strong></td>
+                        <td><strong>{{ 'Rp ' . number_format($pembelian->total_harga, 0, ',', '.') }}</strong></td>
                     </tr>
                 </tbody>
             </table>

@@ -40,10 +40,10 @@ class LaporanItemController extends Controller
                 'tanggal' => $tanggal,
                 'nama' => $item->nama,
                 'merek' => $item->merek,
-                'uom' => $item->uom,
+                // 'uom' => $item->uom,
                 'pembelian' => $jumlah_pembelian,
                 'penjualan' => $jumlah_penjualan,
-                'sisa_stok' => $item->stock
+                'sisa_stok' => $item->stock_dus + $item->stock_pcs + $item->stock_rcg
             ];
         }
 

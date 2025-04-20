@@ -68,6 +68,7 @@
                                 <input type="number" name="items[{{ $i }}][harga_beli]" class="form-control" min="1"
                                     value="{{ old("items.$i.harga_beli", $itemDetail['harga_beli']) }}" required>
                             </td>
+
                             <td>
                                 <button type="button" class="btn btn-danger remove-item" {{ $i == 0 ? 'disabled' : '' }}>Hapus</button>
                             </td>

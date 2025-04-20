@@ -22,9 +22,9 @@
                     <tr>
                         <th scope="col">Nama</th>
                         <th scope="col">Merk</th>
-                        <th scope="col">UOM</th>
+                        {{-- <th scope="col">UOM</th> --}}
                         <th scope="col">Harga Jual</th>
-                        <th scope="col">Harga Beli</th>
+                        {{-- <th scope="col">Harga Beli</th> --}}
                         <th scope="col">Stock</th>
                         <th scope="col">Action</th>
                     </tr>
@@ -35,10 +35,13 @@
                             <tr class="table">
                                 <td>{{ $item->nama }}</td>
                                 <td>{{ $item->merek }}</td>
-                                <td>{{ $item->uom }}</td>
+                                {{-- <td>{{ $item->uom }}</td> --}}
                                 <td>{{ $item->harga_jual }}</td>
-                                <td>{{ $item->harga_beli }}</td>
-                                <td>{{ $item->stock }}</td>
+                                {{-- <td>{{ $item->harga_beli }}</td> --}}
+                                <td> @if($item->stock_dus) <strong>{{ $item->stock_dus }} dus</strong><br> @endif
+                                    @if($item->stock_rcg) <strong>{{ $item->stock_rcg }} renceng</strong><br> @endif
+                                    @if($item->stock_pcs) <strong>{{ $item->stock_pcs }} pcs</strong> @endif
+                                </td>
                                 <td>
                                     <div class="dropdown d-flex justify-content-center">
                                         <button class="btn btn-primary btn-sm dropdown-toggle" type="button"

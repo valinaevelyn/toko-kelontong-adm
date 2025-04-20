@@ -12,11 +12,11 @@ class PembelianDetail extends Model
     {
         parent::boot();
 
-        static::saving(function ($detail) {
-            if ($detail->item) {
-                $detail->total_harga = $detail->jumlah * $detail->item->harga_beli;
-            }
-        });
+        // static::saving(function ($detail) {
+        //     if ($detail->item) {
+        //         $detail->total_harga = $detail->jumlah * $detail->item->harga_beli;
+        //     }
+        // });
 
         static::saved(function ($detail) {
             $detail->pembelian->updateTotalHarga();

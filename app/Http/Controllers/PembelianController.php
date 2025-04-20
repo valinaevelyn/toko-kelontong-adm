@@ -45,8 +45,6 @@ class PembelianController extends Controller
         $request->validate([
             'nama_supplier' => 'required|string',
             'items' => 'required|array',
-            'items.*.id' => 'required|exists:items,id',
-            'items.*.jumlah' => 'required|integer|min:1',
         ]);
 
         $tanggal = Carbon::now();
@@ -74,19 +72,37 @@ class PembelianController extends Controller
         foreach ($request->items as $item) {
             $itemData = Item::find($item['id']);
 
-            $subtotal = $item['jumlah'] * $itemData->harga_beli;
+
+            $pcsFromDus = $item['stock_dus'] * $itemData->dus_in_pcs;
+            $pcsFromRcg = $item['stock_rcg'] * $itemData->rcg_in_pcs;
+            $totalPcs = $pcsFromDus + $pcsFromRcg + $item['stock_pcs'];
+
+            // $subtotal = $item['jumlah'] * $itemData->harga_satuan;
+
+            // dd($totalPcs, $item['harga_satuan']);
+
+            // $subtotal = $totalPcs * $item['harga_satuan'];
+
+            // dd($subtotal);
 
             PembelianDetail::create([
                 'pembelian_id' => $pembelian->id,
                 'item_id' => $item['id'],
-                'jumlah' => $item['jumlah'],
-                'total_harga' => $subtotal,
+                'jumlah_dus' => $item['stock_dus'],
+                'jumlah_rcg' => $item['stock_rcg'],
+                'jumlah_pcs' => $item['stock_pcs'],
+                'jumlah' => $totalPcs,
+                'harga_satuan' => $item['harga_satuan'],
             ]);
 
+            // dd()
+
             // Tambah stok item
-            $itemData->increment('stock', $item['jumlah']);
-            $totalHarga += $subtotal;
-            $totalItem += $item['jumlah'];
+            $itemData->increment('stock_dus', $item['stock_dus'] ?? 0);
+            $itemData->increment('stock_rcg', $item['stock_rcg'] ?? 0);
+            $itemData->increment('stock_pcs', $item['stock_pcs'] ?? 0);
+            $totalHarga += $totalPcs * $item['harga_satuan'];
+            $totalItem += $totalPcs;
         }
 
         // Update total harga pembelian
@@ -120,58 +136,59 @@ class PembelianController extends Controller
      */
     public function update(Request $request, Pembelian $pembelian)
     {
-        $rules = [
-            'nama_supplier' => 'required|string',
-            'items' => 'required|array',
-            'items.*.id' => 'required|exists:items,id',
-            'items.*.jumlah' => 'required|integer|min:1',
-        ];
+        foreach ($pembelian->pembelianDetails as $detail) {
+            $item = Item::find($detail->item_id);
+            // $item->increment('stock', $detail->jumlah);
 
-        $message = [
-            'required' => ':attribute tidak boleh kosong',
-        ];
+            $item->increment('stock_dus', $detail->jumlah_dus);
+            $item->increment('stock_rcg', $detail->jumlah_rcg);
+            $item->increment('stock_pcs', $detail->jumlah_pcs);
 
-        $validator = Validator::make($request->all(), $rules, $message);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withInput()->withErrors($validator)
-                ->with('danger', 'Pastikan semua field terisi');
-        } else {
-            foreach ($pembelian->pembelianDetails as $detail) {
-                $item = Item::find($detail->item_id);
-                $item->increment('stock', $detail->jumlah);
-                $detail->delete();
-            }
-
-            $totalHarga = 0;
-            $totalItem = 0;
-
-            foreach ($request->items as $item) {
-                $itemData = Item::find($item['id']);
-
-                $subtotal = $item['jumlah'] * $itemData->harga_beli;
-
-                PembelianDetail::create([
-                    'pembelian_id' => $pembelian->id,
-                    'item_id' => $item['id'],
-                    'jumlah' => $item['jumlah'],
-                    'total_harga' => $subtotal,
-                ]);
-
-                // Tambah stok item
-                $itemData->increment('stock', $item['jumlah']);
-                $totalHarga += $subtotal;
-                $totalItem += $item['jumlah'];
-            }
-            // Update total harga pembelian
-            $pembelian->update([
-                'total_harga' => $totalHarga,
-                'total_item' => $totalItem,
-                'nama_supplier' => $request->nama_supplier,
-            ]);
-            return redirect()->route('pembelian.index')->with('success', 'Pembelian berhasil diperbarui!');
+            $detail->delete();
         }
+
+        $totalHarga = 0;
+        $totalItem = 0;
+
+        foreach ($request->items as $item) {
+            $itemData = Item::find($item['id']);
+
+            // Calculate total PCS from DUS and RCG
+            $pcsFromDus = $item['stock_dus'] * $itemData->dus_in_pcs;
+            ;
+            $pcsFromRcg = $item['stock_rcg'] * $itemData->rcg_in_pcs;
+            ;
+            $totalPcs = $pcsFromDus + $pcsFromRcg + ($item['stock_pcs'] ?? 0);
+
+            // Calculate subtotal
+            $subtotal = $totalPcs * $item['harga_satuan'];
+
+            // Store new purchase details
+            PembelianDetail::create([
+                'pembelian_id' => $pembelian->id,
+                'item_id' => $item['id'],
+                'jumlah_dus' => $item['stock_dus'],
+                'jumlah_rcg' => $item['stock_rcg'],
+                'jumlah_pcs' => $item['stock_pcs'],
+                'jumlah' => $totalPcs,
+                'harga_satuan' => $item['harga_satuan'],
+            ]);
+
+            // Update stock for the item
+            $itemData->increment('stock_dus', $item['stock_dus'] ?? 0);
+            $itemData->increment('stock_rcg', $item['stock_rcg'] ?? 0);
+            $itemData->increment('stock_pcs', $item['stock_pcs'] ?? 0);
+            $totalHarga += $subtotal;
+            $totalItem += $totalPcs;
+        }
+        // Update total harga pembelian
+        $pembelian->update([
+            'total_harga' => $totalHarga,
+            'total_item' => $totalItem,
+            'nama_supplier' => $request->nama_supplier,
+        ]);
+        return redirect()->route('pembelian.index')->with('success', 'Pembelian berhasil diperbarui!');
+
     }
 
     /**
@@ -192,7 +209,7 @@ class PembelianController extends Controller
         ]);
 
         $pembelian = Pembelian::findOrFail($id);
-        $totalHarga = $pembelian->pembelianDetails->sum('total_harga');
+        $totalHarga = $pembelian->total_harga;
         $jumlahUang = $request->jumlah_uang;
         $metode = $request->metode_pembayaran;
 

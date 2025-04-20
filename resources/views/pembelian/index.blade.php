@@ -58,11 +58,14 @@
                                 <td class="align-middle">{{ $pembelian->nama_supplier }}</td>
                                 <td class="align-middle">
                                     @foreach ($pembelian->pembelianDetails as $pembelianDetail)
-                                        {{ $pembelianDetail->item->nama }} ({{ $pembelianDetail->jumlah }})<br>
+                                        {{ $pembelianDetail->item->nama }} :
+                                        @if($pembelianDetail->jumlah_dus) {{ $pembelianDetail->jumlah_dus }} dus @endif
+                                        @if($pembelianDetail->jumlah_rcg) {{ $pembelianDetail->jumlah_rcg }} rcg @endif
+                                        @if($pembelianDetail->jumlah_pcs) {{ $pembelianDetail->jumlah_pcs }} pcs @endif<br>
                                     @endforeach
                                 </td>
                                 <td class="align-middle">
-                                    {{ 'Rp ' . number_format($pembelian->pembelianDetails->sum('total_harga'), 0, ',', '.') }}
+                                    {{ 'Rp ' . number_format($pembelian->total_harga, 0, ',', '.') }}
                                 </td>
                                 <td class="align-middle">{{ $pembelian->total_item }}</td>
                                 <td class="align-middle">{{ 'Rp ' . number_format($pembelian->total_uang, 0, ',', '.') }}</td>

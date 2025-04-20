@@ -14,10 +14,18 @@ return new class extends Migration {
             $table->id();
             $table->string('nama');
             $table->string('merek');
-            $table->string('uom');
+            // $table->string('uom');
             $table->integer('harga_jual');
-            $table->integer('harga_beli');
-            $table->integer('stock');
+            // $table->integer('harga_beli');
+            // $table->integer('stock');
+
+            $table->integer('stock_dus')->nullable()->default(0);
+            $table->integer('stock_rcg')->nullable()->default(0);
+            $table->integer('stock_pcs')->nullable()->default(0);
+
+            $table->integer('dus_in_pcs')->nullable()->default(0);
+            $table->integer('rcg_in_pcs')->nullable()->default(0);
+
             $table->timestamps();
         });
     }

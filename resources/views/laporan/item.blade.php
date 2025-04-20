@@ -24,10 +24,10 @@
                         <th>TANGGAL</th>
                         <th>NAMA ITEM</th>
                         {{-- <th>KETERANGAN</th> --}}
-                        <th>UOM</th>
+                        {{-- <th>UOM</th> --}}
                         <th>JUMLAH PEMBELIAN</th>
                         <th>JUMLAH PENJUALAN</th>
-                        <th>SISA STOK</th>
+                        <th>SISA STOK (PCS)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -36,7 +36,7 @@
                             <td>{{ $d['tanggal'] }}</td>
                             <td>{{ $d['nama'] }}</td>
                             {{-- <td>{{ $d['keterangan'] }}</td> --}}
-                            <td>{{ $d['uom'] }}</td>
+                            {{-- <td>{{ $d['uom'] }}</td> --}}
                             <td>{{ $d['pembelian'] }}</td>
                             <td>{{ $d['penjualan'] }}</td>
                             <td>{{ $d['sisa_stok'] }}</td>
