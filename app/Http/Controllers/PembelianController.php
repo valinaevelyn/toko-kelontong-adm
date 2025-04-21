@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
+use App\Models\LaporanUtang;
 use App\Models\Pembelian;
 use App\Models\PembelianDetail;
 use Carbon\Carbon;
@@ -219,19 +220,50 @@ class PembelianController extends Controller
 
         $kembalian = ($metode === 'CASH') ? $jumlahUang - $totalHarga : 0;
 
-        $pembelian->status = 'LUNAS';
+        // $pembelian->status = 'LUNAS';
+        // $pembelian->kembalian = $kembalian;
+        // $pembelian->total_uang = $metode === 'CASH' ? $jumlahUang : 0;
+        // $pembelian->metode = $metode;
+
+        // if ($metode === 'CEK') {
+        //     $pembelian->kode_cek = $request->kode_cek;
+        //     $pembelian->tanggal_cair = $request->tanggal_cair;
+        // }
+
+        if ($metode == 'CASH') {
+            $pembelian->total_uang = $jumlahUang;
+            $pembelian->status = 'LUNAS';
+        }
+
         $pembelian->kembalian = $kembalian;
-        $pembelian->total_uang = $metode === 'CASH' ? $jumlahUang : 0;
         $pembelian->metode = $metode;
 
-        if ($metode === 'CEK') {
+        if ($metode == 'TRANSFER') {
+            $pembelian->status = 'LUNAS';
+        }
+
+        if ($metode == 'CEK') {
             $pembelian->kode_cek = $request->kode_cek;
             $pembelian->tanggal_cair = $request->tanggal_cair;
+            $pembelian->status = $request->status_saldo;
+        }
+
+        if ($metode == 'KREDIT') {
+            $pembelian->status = $request->status_saldo;
         }
 
         $pembelian->save();
 
-        return response()->json(['success' => true, 'message' => 'Pembelian berhasil dilunasi'], 200);
+        if ($pembelian->tanggal_cair) {
+            $laporanUtang = LaporanUtang::where('pembelian_id', $pembelian->id)->first();
+
+            if ($laporanUtang) {
+                $laporanUtang->status_terlambat = 'Sudah lunas';
+                $laporanUtang->save();
+            }
+        }
+
+        return response()->json(['success' => true, 'message' => 'Berhasil'], 200);
     }
 
     public function cetakFaktur($id)

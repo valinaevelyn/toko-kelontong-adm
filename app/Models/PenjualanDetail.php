@@ -12,11 +12,11 @@ class PenjualanDetail extends Model
     {
         parent::boot();
 
-        static::saving(function ($detail) {
-            if ($detail->item) {
-                $detail->total_harga = $detail->jumlah * $detail->item->harga_jual;
-            }
-        });
+        // static::saving(function ($detail) {
+        //     if ($detail->item) {
+        //         $detail->total_harga = $detail->jumlah * $detail->item->harga_jual;
+        //     }
+        // });
 
         static::saved(function ($detail) {
             $detail->penjualan->updateTotalHarga();

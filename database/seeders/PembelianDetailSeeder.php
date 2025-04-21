@@ -67,7 +67,6 @@ class PembelianDetailSeeder extends Seeder
                     'jumlah_pcs' => $stockPcs,
                     'jumlah' => $jumlahPcs,
                     'harga_satuan' => $hargaSatuan,
-
                 ]);
 
                 // Update stok item

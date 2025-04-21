@@ -34,7 +34,7 @@ class PenjualanController extends Controller
      */
     public function create()
     {
-        $items = Item::all()->where('stock', '>', 0);
+        $items = Item::all();
         return view('penjualan.create', compact('items'));
     }
 
@@ -46,8 +46,6 @@ class PenjualanController extends Controller
         $request->validate([
             'nama_pembeli' => 'required|string',
             'items' => 'required|array',
-            'items.*.id' => 'required|exists:items,id',
-            'items.*.jumlah' => 'required|integer|min:1',
         ]);
 
         $tanggal = Carbon::now();
@@ -75,23 +73,56 @@ class PenjualanController extends Controller
         foreach ($request->items as $item) {
             $itemData = Item::find($item['id']);
 
-            if ($itemData->stock < $item['jumlah']) {
+            // if ($itemData->stock < $item['jumlah']) {
+            //     return redirect()->route('penjualan.create')->with('error', 'Stok item tidak mencukupi!');
+            // }
+
+            // $pcsFromDus = $item['stock_dus'] * $itemData->dus_in_pcs;
+            // $pcsFromRcg = $item['stock_rcg'] * $itemData->rcg_in_pcs;
+            // $totalPcs = $pcsFromDus + $pcsFromRcg + $item['stock_pcs'];
+
+            // Konversi ke PCS berdasarkan satuan yang dipilih
+            $jumlahPCS = 0;
+
+            switch ($item['satuan']) {
+                case 'dus':
+                    $jumlahPCS = $item['jumlah'] * $itemData->dus_in_pcs;
+                    break;
+                case 'rcg':
+                    $jumlahPCS = $item['jumlah'] * $itemData->rcg_in_pcs;
+                    break;
+                case 'pcs':
+                    $jumlahPCS = $item['jumlah'];
+                    break;
+            }
+
+            // Cek apakah stok mencukupi
+            $stok_tersedia = ($itemData->stock_dus * $itemData->dus_in_pcs) +
+                ($itemData->stock_rcg * $itemData->rcg_in_pcs) +
+                $itemData->stock_pcs;
+
+            if ($stok_tersedia < $jumlahPCS) {
                 return redirect()->route('penjualan.create')->with('error', 'Stok item tidak mencukupi!');
             }
 
-            $subtotal = $item['jumlah'] * $itemData->harga_jual;
+            // $subtotal = $item['jumlah'] * $itemData->harga_jual;
 
             PenjualanDetail::create([
                 'penjualan_id' => $penjualan->id,
                 'item_id' => $item['id'],
-                'jumlah' => $item['jumlah'],
-                'total_harga' => $subtotal,
+                // 'jumlah_dus' => $item['stock_dus'],
+                // 'jumlah_rcg' => $item['stock_rcg'],
+                // 'jumlah_pcs' => $item['stock_pcs'],
+                'jumlah' => $jumlahPCS,
+                'harga_satuan' => $item['harga_satuan'],
             ]);
 
             // Kurangi stok item
-            $itemData->decrement('stock', $item['jumlah']);
-            $totalHarga += $subtotal;
-            $totalItem += $item['jumlah'];
+            // $itemData->decrement('stock_dus', $item['stock_dus'] ?? 0);
+            // $itemData->decrement('stock_rcg', $item['stock_rcg'] ?? 0);
+            // $itemData->decrement('stock_pcs', $item['stock_pcs'] ?? 0);
+            $totalHarga += $jumlahPCS * $item['harga_satuan'];
+            $totalItem += $jumlahPCS;
         }
 
         // Update total harga penjualan
@@ -197,8 +228,15 @@ class PenjualanController extends Controller
 
     public function pelunasan(Request $request, $id)
     {
+        $request->validate([
+            'jumlah_uang' => 'nullable|required_if:metode_pembayaran,CASH|numeric|min:0',
+            'metode_pembayaran' => 'required|in:CASH,KREDIT,CEK,TRANSFER',
+            'kode_cek' => 'required_if:metode_pembayaran,CEK|string|nullable',
+            'tanggal_cair' => 'required_if:metode_pembayaran,CEK|date|nullable',
+        ]);
+
         $penjualan = Penjualan::findOrFail($id);
-        $totalHarga = $penjualan->penjualanDetails->sum('total_harga');
+        $totalHarga = $penjualan->total_harga_akhir;
         $jumlahUang = $request->jumlah_uang;
         $metode = $request->metode_pembayaran;
 

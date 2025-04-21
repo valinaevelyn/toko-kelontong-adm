@@ -60,11 +60,14 @@
                                 <td class="align-middle">
                                     {{-- loop item yang ada di penjualanDetails --}}
                                     @foreach ($penjualan->penjualanDetails as $penjualanDetail)
-                                        {{ $penjualanDetail->item->nama }} ({{ $penjualanDetail->jumlah }})<br>
+                                        <b>{{ $penjualanDetail->item->nama }}</b> :
+                                        @if($penjualanDetail->jumlah_dus) {{ $penjualanDetail->jumlah_dus }} dus @endif
+                                        @if($penjualanDetail->jumlah_rcg) {{ $penjualanDetail->jumlah_rcg }} rcg @endif
+                                        @if($penjualanDetail->jumlah_pcs) {{ $penjualanDetail->jumlah_pcs }} pcs @endif<br>
                                     @endforeach
                                 </td>
                                 <td class="align-middle">
-                                    {{ 'Rp ' . number_format($penjualan->penjualanDetails->sum('total_harga'), 0, ',', '.') }}
+                                    {{ 'Rp ' . number_format($penjualan->total_harga_akhir, 0, ',', '.') }}
                                 </td>
 
                                 <td class="align-middle">{{ $penjualan->total_item }}</td>
@@ -102,7 +105,7 @@
                             </tr>
                         @else
                             <tr class="table-secondary">
-                                <td colspan="2">Tidak ada item tersedia.</td>
+                                <td colspan="10">Tidak ada item tersedia.</td>
                             </tr>
                         @endif
                     @endforeach

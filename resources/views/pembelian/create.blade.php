@@ -1,5 +1,4 @@
 @extends('layouts.master')
-
 @section('pembelianActive', 'active')
 @section('content')
     <div class="container mt-4">
