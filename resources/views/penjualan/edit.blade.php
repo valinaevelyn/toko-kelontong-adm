@@ -28,7 +28,9 @@
                 <thead>
                     <tr>
                         <th>Item</th>
-                        <th>Jumlah</th>
+                        <th>UOM</th>
+                        <th>Jumlah </th>
+                        <th>Harga Jual</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -38,34 +40,56 @@
                         $oldItems = $penjualan->penjualanDetails->map(function ($detail) {
                             return [
                                 'id' => $detail->item_id,
-                                'jumlah' => $detail->jumlah,
+                                'jumlah_dus' => $detail->jumlah_dus,
+                                'jumlah_rcg' => $detail->jumlah_rcg,
+                                'jumlah_pcs' => $detail->jumlah_pcs,
+                                'dus_in_pcs' => $detail->item->dus_in_pcs,
+                                'rcg_in_pcs' => $detail->item->rcg_in_pcs,
+                                'harga_satuan' => $detail->harga_satuan,
+                                'satuan' => $detail->jumlah_dus > 0 ? 'dus' : ($detail->jumlah_rcg > 0 ? 'rcg' : 'pcs'), // atau bisa juga diisi default seperti 'pcs'
+                'jumlah' => $detail->jumlah_dus ?: ($detail->jumlah_rcg ?: $detail->jumlah_pcs),
                             ];
                         })->toArray();
                     }
                 @endphp
                 <tbody id="itemTableBody">
                     @foreach($oldItems as $i => $itemDetail)
-                        <tr>
-                            <td>
-                                <select name="items[{{ $i }}][id]" class="form-select" required>
-                                    <option value="" disabled {{ !isset($itemDetail['id']) ? 'selected' : '' }}>Pilih Item
-                                    </option>
-                                    @foreach($items as $item)
-                                        <option value="{{ $item->id }}" {{ (old("items.$i.id", $itemDetail['id']) == $item->id) ? 'selected' : '' }}>
-                                            {{ $item->nama }} (Stok: {{ $item->stock }}, Rp
-                                            {{ number_format($item->harga_jual, 0, ',', '.') }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <input type="number" name="items[{{ $i }}][jumlah]" class="form-control" min="1"
-                                    value="{{ old("items.$i.jumlah", $itemDetail['jumlah']) }}" required>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-danger remove-item" {{ $i == 0 ? 'disabled' : '' }}>Hapus</button>
-                            </td>
-                        </tr>
+                                <tr>
+                                    <td>
+                                        <select name="items[{{ $i }}][id]" class="form-select" required>
+                                            <option value="" disabled {{ !isset($itemDetail['id']) ? 'selected' : '' }}>Pilih Item
+                                            </option>
+                                            @foreach($items as $item)
+                                                                    @php
+                                                                        $total_stock = ($item->stock_dus * $item->dus_in_pcs) + ($item->stock_rcg * $item->rcg_in_ps) + $item->stock_pcs;
+                                                                    @endphp
+                                                                    <option value="{{ $item->id }}" {{ (old("items.$i.id", $itemDetail['id']) == $item->id) ? 'selected' : '' }}>
+                                                                        {{ $item->nama }} (Stok: {{ $total_stock }})
+                                                                    </option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+
+                                    <td>
+                                        <select name="items[{{ $i }}][satuan]" class="form-select" required>
+                                            <option value="" disabled selected>Pilih Satuan</option>
+                                            <option value="dus" {{ old("items.$i.satuan", $itemDetail['satuan']) == 'dus' ? 'selected' : '' }}>DUS</option>
+                                            <option value="rcg" {{ old("items.$i.satuan", $itemDetail['satuan']) == 'rcg' ? 'selected' : '' }}>RCG</option>
+                                            <option value="pcs" {{ old("items.$i.satuan", $itemDetail['satuan']) == 'pcs' ? 'selected' : '' }}>PCS</option>
+                                        </select>
+
+                                    <td>
+                                        <input type="number" name="items[{{ $i }}][jumlah]" class="form-control" min="0"
+                                            value="{{ old("items.$i.jumlah", $itemDetail['jumlah']) }}" required>
+                                    </td>
+                                    <td>
+                                            <input type="number" name="items[{{ $i }}][harga_satuan]" class="form-control" min="0"
+                                            value="{{ old("items.$i.harga_satuan", $itemDetail['harga_satuan']) }}" required>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger remove-item" {{ $i == 0 ? 'disabled' : '' }}>Hapus</button>
+                                    </td>
+                                </tr>
                     @endforeach
                 </tbody>
             </table>
@@ -76,15 +100,35 @@
                         <select name="items[__INDEX__][id]" class="form-select" required>
                             <option value="" selected disabled>Pilih Item</option>
                             @foreach($items as $item)
-                                <option value="{{ $item->id }}">
-                                    {{ $item->nama }} (Stok: {{ $item->stock }}, Rp
-                                    {{ number_format($item->harga_jual, 0, ',', '.') }})
-                                </option>
+                                                    @php
+                                                        $total_stock = ($item->stock_dus * $item->dus_in_pcs) + ($item->stock_rcg * $item->rcg_in_ps) + $item->stock_pcs;
+                                                    @endphp
+                                                    <option value="{{ $item->id }}" data-pcs-dus="{{ $item->dus_in_pcs }}"
+                                                        data-pcs-rcg="{{ $item->rcg_in_ps }}">
+                                                        {{ $item->nama }} (Stok: {{ $total_stock }})
+                                                    </option>
                             @endforeach
                         </select>
                     </td>
+                    
                     <td>
-                        <input type="number" name="items[__INDEX__][jumlah]" class="form-control" min="1" required>
+                        <select name="items[__INDEX__][satuan]" class="form-select" required>
+                            <option value="" selected disabled>Pilih Satuan</option>
+                            <option value="dus">DUS</option>
+                            <option value="rcg">RCG</option>
+                            <option value="pcs">PCS</option>
+                        </select>
+
+                    </td>
+
+                    <td>
+                        <input type="number" name="items[__INDEX__][jumlah]" class="form-control" min="0" required>
+
+                    </td>
+
+                    <td>
+                        <input type="number" name="items[__INDEX__][harga_satuan]" class="form-control" min="0" required>
+
                     </td>
                     <td>
                         <button type="button" class="btn btn-danger remove-item">Hapus</button>

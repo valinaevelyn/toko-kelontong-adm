@@ -29,7 +29,11 @@
                 <thead>
                     <tr>
                         <th>Item</th>
-                        <th>Jumlah</th>
+                        <th>Jumlah DUS</th>
+                        <th>Jumlah RCG</th>
+                        <th>Jumlah PCS</th>
+                        <th>PCS per DUS</th>
+                        <th>PCS per RCG</th>
                         <th>Harga Beli Satuan</th>
                         <th>Action</th>
                     </tr>
@@ -40,39 +44,61 @@
                         $oldItems = $pembelian->pembelianDetails->map(function ($detail) {
                             return [
                                 'id' => $detail->item_id,
-                                'jumlah' => $detail->jumlah,
-                                'harga_beli' => $detail->item->harga_beli,
+                                'jumlah_dus' => $detail->jumlah_dus,
+                                'jumlah_rcg' => $detail->jumlah_rcg,
+                                'jumlah_pcs' => $detail->jumlah_pcs,
+                                'dus_in_pcs' => $detail->item->dus_in_pcs,
+                                'rcg_in_pcs' => $detail->item->rcg_in_pcs,
+                                'harga_satuan' => $detail->harga_satuan,
                             ];
                         })->toArray();
                     }
                 @endphp
                 <tbody id="itemTableBody">
                     @foreach($oldItems as $i => $itemDetail)
-                        <tr>
-                            <td>
-                                <select name="items[{{ $i }}][id]" class="form-select" required>
-                                    <option value="" disabled {{ !isset($itemDetail['id']) ? 'selected' : '' }}>Pilih Item
-                                    </option>
-                                    @foreach($items as $item)
-                                        <option value="{{ $item->id }}" {{ (old("items.$i.id", $itemDetail['id']) == $item->id) ? 'selected' : '' }}>
-                                            {{ $item->nama }} (Stok: {{ $item->stock }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td>
-                                <input type="number" name="items[{{ $i }}][jumlah]" class="form-control" min="1"
-                                    value="{{ old("items.$i.jumlah", $itemDetail['jumlah']) }}" required>
-                            </td>
-                            <td>
-                                <input type="number" name="items[{{ $i }}][harga_beli]" class="form-control" min="1"
-                                    value="{{ old("items.$i.harga_beli", $itemDetail['harga_beli']) }}" required>
-                            </td>
-
-                            <td>
-                                <button type="button" class="btn btn-danger remove-item" {{ $i == 0 ? 'disabled' : '' }}>Hapus</button>
-                            </td>
-                        </tr>
+                                <tr>
+                                    <td>
+                                        <select name="items[{{ $i }}][id]" class="form-select" required>
+                                            <option value="" disabled {{ !isset($itemDetail['id']) ? 'selected' : '' }}>Pilih Item
+                                            </option>
+                                            @foreach($items as $item)
+                                                                    @php
+                                                                        $total_stock = ($item->stock_dus * $item->dus_in_pcs) + ($item->stock_rcg * $item->rcg_in_ps) + $item->stock_pcs;
+                                                                    @endphp
+                                                                    <option value="{{ $item->id }}" {{ (old("items.$i.id", $itemDetail['id']) == $item->id) ? 'selected' : '' }}>
+                                                                        {{ $item->nama }} (Stok: {{ $total_stock }})
+                                                                    </option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="items[{{ $i }}][jumlah_dus]" class="form-control" min="0"
+                                            value="{{ old("items.$i.jumlah_dus", $itemDetail['jumlah_dus']) }}" required>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="items[{{ $i }}][jumlah_rcg]" class="form-control" min="0"
+                                            value="{{ old("items.$i.jumlah_rcg", $itemDetail['jumlah_rcg']) }}" required>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="items[{{ $i }}][jumlah_pcs]" class="form-control" min="0"
+                                            value="{{ old("items.$i.jumlah_pcs", $itemDetail['jumlah_pcs']) }}" required>
+                                    </td>
+                                    <td>
+                                        <input type="number" name="items[{{ $i }}][dus_in_pcs]" class="form-control" min="0"
+                                            value="{{ old("items.$i.dus_in_pcs", $itemDetail['dus_in_pcs']) }}">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="items[{{ $i }}][rcg_in_pcs]" class="form-control" min="0"
+                                            value="{{ old("items.$i.rcg_in_pcs", $itemDetail['rcg_in_pcs']) }}">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="items[{{ $i }}][harga_satuan]" class="form-control" min="1"
+                                            value="{{ old("items.$i.harga_satuan", $itemDetail['harga_satuan']) }}" required>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger remove-item" {{ $i == 0 ? 'disabled' : '' }}>Hapus</button>
+                                    </td>
+                                </tr>
                     @endforeach
                 </tbody>
             </table>
@@ -83,17 +109,27 @@
                         <select name="items[__INDEX__][id]" class="form-select" required>
                             <option value="" selected disabled>Pilih Item</option>
                             @foreach($items as $item)
-                                <option value="{{ $item->id }}">
-                                    {{ $item->nama }} (Stok: {{ $item->stock }})
-                                </option>
+                                <option value="{{ $item->id }}">{{ $item->nama }} (Stok: {{ $item->stock }})</option>
                             @endforeach
                         </select>
                     </td>
                     <td>
-                        <input type="number" name="items[__INDEX__][jumlah]" class="form-control" min="1" required>
+                        <input type="number" name="items[__INDEX__][jumlah_dus]" class="form-control" min="0" required>
                     </td>
                     <td>
-                        <input type="number" name="items[__INDEX__][harga_beli]" class="form-control" min="1" required>
+                        <input type="number" name="items[__INDEX__][jumlah_rcg]" class="form-control" min="0" required>
+                    </td>
+                    <td>
+                        <input type="number" name="items[__INDEX__][jumlah_pcs]" class="form-control" min="0" required>
+                    </td>
+                    <td>
+                        <input type="number" name="items[__INDEX__][dus_in_pcs]" class="form-control" min="0">
+                    </td>
+                    <td>
+                        <input type="number" name="items[__INDEX__][rcg_in_pcs]" class="form-control" min="0">
+                    </td>
+                    <td>
+                        <input type="number" name="items[__INDEX__][harga_satuan]" class="form-control" min="1" required>
                     </td>
                     <td>
                         <button type="button" class="btn btn-danger remove-item">Hapus</button>
@@ -110,23 +146,25 @@
     </div>
 @endsection
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        let itemIndex = {{ count($oldItems) }};
-        const addItemButton = document.getElementById("addItem");
-        const itemTableBody = document.getElementById("itemTableBody");
-        const itemTemplate = document.getElementById("itemRowTemplate").innerHTML;
+@section('scripts')
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let itemIndex = {{ count($oldItems) }};
+            const addItemButton = document.getElementById("addItem");
+            const itemTableBody = document.getElementById("itemTableBody");
+            const itemTemplate = document.getElementById("itemRowTemplate").innerHTML;
 
-        addItemButton.addEventListener("click", function () {
-            const newRow = itemTemplate.replaceAll('__INDEX__', itemIndex);
-            itemTableBody.insertAdjacentHTML("beforeend", newRow);
-            itemIndex++;
-        });
+            addItemButton.addEventListener("click", function () {
+                const newRow = itemTemplate.replaceAll('__INDEX__', itemIndex);
+                itemTableBody.insertAdjacentHTML("beforeend", newRow);
+                itemIndex++;
+            });
 
-        itemTableBody.addEventListener("click", function (e) {
-            if (e.target.classList.contains("remove-item")) {
-                e.target.closest("tr").remove();
-            }
+            itemTableBody.addEventListener("click", function (e) {
+                if (e.target.classList.contains("remove-item")) {
+                    e.target.closest("tr").remove();
+                }
+            });
         });
-    });
-</script>
+    </script>
+@endsection

@@ -10,27 +10,19 @@
         <form action="{{ route('penjualan.store') }}" method="POST">
             @csrf
             <div class="mb-4 mt-4">
-                <label class="form-label">Nama Supplier</label>
-                <input type="text" name="nama_supplier" class="form-control" required>
+                <label class="form-label">Nama Pembeli</label>
+                <input type="text" name="nama_pembeli" class="form-control" required>
             </div>
 
             <h4>Items</h4>
             <table class="table table-bordered text-center">
                 <thead>
                     <tr>
-                        {{-- <th>Item</th> --}}
-                        {{-- <th>Jumlah DUS</th>
-                        <th>Jumlah RCG</th>
-                        <th>Jumlah PCS</th>
-                        <th>PCS per DUS</th>
-                        <th>PCS per RCG</th>
-                        <th>Harga Beli Satuan</th> --}}
                         <th>Item</th>
                         <th>UOM</th>
                         <th>Jumlah </th>
                         <th>Harga Jual</th>
                         <th>Action</th>
-                        {{-- <th>Action</th> --}}
                     </tr>
                 </thead>
                 <tbody id="itemTableBody">
@@ -39,10 +31,13 @@
                             <select name="items[0][id]" class="form-select item-select" required>
                                 <option value="" selected disabled>Pilih Item</option>
                                 @foreach($items as $item)
-                                    <option value="{{ $item->id }}" data-dus-in-pcs="{{ $item->dus_in_pcs }}"
-                                        data-rcg-in-pcs="{{ $item->rcg_in_ps }}">
-                                        {{ $item->nama }}
-                                    </option>
+                                                            @php
+                                                                $total_stock = ($item->stock_dus * $item->dus_in_pcs) + ($item->stock_rcg * $item->rcg_in_ps) + $item->stock_pcs;
+                                                            @endphp
+                                                            <option value="{{ $item->id }}" data-dus-in-pcs="{{ $item->dus_in_pcs }}"
+                                                                data-rcg-in-pcs="{{ $item->rcg_in_ps }}">
+                                                                {{ $item->nama }} (Stok: {{ $total_stock }})
+                                                            </option>
                                 @endforeach
                             </select>
                         </td>

@@ -137,13 +137,13 @@ class PembelianController extends Controller
      */
     public function update(Request $request, Pembelian $pembelian)
     {
+        // Hapus detail lama dan kembalikan stok ke item
         foreach ($pembelian->pembelianDetails as $detail) {
             $item = Item::find($detail->item_id);
-            // $item->increment('stock', $detail->jumlah);
 
-            $item->increment('stock_dus', $detail->jumlah_dus);
-            $item->increment('stock_rcg', $detail->jumlah_rcg);
-            $item->increment('stock_pcs', $detail->jumlah_pcs);
+            $item->decrement('stock_dus', $detail->jumlah_dus);
+            $item->decrement('stock_rcg', $detail->jumlah_rcg);
+            $item->decrement('stock_pcs', $detail->jumlah_pcs);
 
             $detail->delete();
         }
@@ -154,40 +154,46 @@ class PembelianController extends Controller
         foreach ($request->items as $item) {
             $itemData = Item::find($item['id']);
 
-            // Calculate total PCS from DUS and RCG
-            $pcsFromDus = $item['stock_dus'] * $itemData->dus_in_pcs;
-            ;
-            $pcsFromRcg = $item['stock_rcg'] * $itemData->rcg_in_pcs;
-            ;
-            $totalPcs = $pcsFromDus + $pcsFromRcg + ($item['stock_pcs'] ?? 0);
+            // Ambil data jumlah dan konversi
+            $jumlah_dus = $item['jumlah_dus'] ?? 0;
+            $jumlah_rcg = $item['jumlah_rcg'] ?? 0;
+            $jumlah_pcs = $item['jumlah_pcs'] ?? 0;
+            $dus_in_pcs = $item['dus_in_pcs'] ?? $itemData->dus_in_pcs ?? 0;
+            $rcg_in_pcs = $item['rcg_in_pcs'] ?? $itemData->rcg_in_pcs ?? 0;
 
-            // Calculate subtotal
+            // Hitung total PCS
+            $totalPcs = ($jumlah_dus * $dus_in_pcs) + ($jumlah_rcg * $rcg_in_pcs) + $jumlah_pcs;
+
+            // Hitung subtotal
             $subtotal = $totalPcs * $item['harga_satuan'];
 
-            // Store new purchase details
+            // Simpan detail baru
             PembelianDetail::create([
                 'pembelian_id' => $pembelian->id,
                 'item_id' => $item['id'],
-                'jumlah_dus' => $item['stock_dus'],
-                'jumlah_rcg' => $item['stock_rcg'],
-                'jumlah_pcs' => $item['stock_pcs'],
+                'jumlah_dus' => $jumlah_dus,
+                'jumlah_rcg' => $jumlah_rcg,
+                'jumlah_pcs' => $jumlah_pcs,
                 'jumlah' => $totalPcs,
                 'harga_satuan' => $item['harga_satuan'],
             ]);
 
-            // Update stock for the item
-            $itemData->increment('stock_dus', $item['stock_dus'] ?? 0);
-            $itemData->increment('stock_rcg', $item['stock_rcg'] ?? 0);
-            $itemData->increment('stock_pcs', $item['stock_pcs'] ?? 0);
+            // Update stok item
+            $itemData->increment('stock_dus', $jumlah_dus);
+            $itemData->increment('stock_rcg', $jumlah_rcg);
+            $itemData->increment('stock_pcs', $jumlah_pcs);
+
             $totalHarga += $subtotal;
             $totalItem += $totalPcs;
         }
-        // Update total harga pembelian
+
         $pembelian->update([
             'total_harga' => $totalHarga,
             'total_item' => $totalItem,
             'nama_supplier' => $request->nama_supplier,
+            'tanggal_pembelian' => $request->tanggal_pembelian,
         ]);
+
         return redirect()->route('pembelian.index')->with('success', 'Pembelian berhasil diperbarui!');
 
     }

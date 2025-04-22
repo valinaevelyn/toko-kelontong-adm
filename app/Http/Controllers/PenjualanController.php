@@ -84,14 +84,21 @@ class PenjualanController extends Controller
             // Konversi ke PCS berdasarkan satuan yang dipilih
             $jumlahPCS = 0;
 
+            $jumlah_dus = 0;
+            $jumlah_rcg = 0;
+            $jumlah_pcs = 0;
+
             switch ($item['satuan']) {
                 case 'dus':
+                    $jumlah_dus = $item['jumlah'];
                     $jumlahPCS = $item['jumlah'] * $itemData->dus_in_pcs;
                     break;
                 case 'rcg':
+                    $jumlah_rcg = $item['jumlah'];
                     $jumlahPCS = $item['jumlah'] * $itemData->rcg_in_pcs;
                     break;
                 case 'pcs':
+                    $jumlah_pcs = $item['jumlah'];
                     $jumlahPCS = $item['jumlah'];
                     break;
             }
@@ -105,22 +112,17 @@ class PenjualanController extends Controller
                 return redirect()->route('penjualan.create')->with('error', 'Stok item tidak mencukupi!');
             }
 
-            // $subtotal = $item['jumlah'] * $itemData->harga_jual;
 
             PenjualanDetail::create([
                 'penjualan_id' => $penjualan->id,
                 'item_id' => $item['id'],
-                // 'jumlah_dus' => $item['stock_dus'],
-                // 'jumlah_rcg' => $item['stock_rcg'],
-                // 'jumlah_pcs' => $item['stock_pcs'],
+                'jumlah_dus' => $jumlah_dus,
+                'jumlah_rcg' => $jumlah_rcg,
+                'jumlah_pcs' => $jumlah_pcs,
                 'jumlah' => $jumlahPCS,
                 'harga_satuan' => $item['harga_satuan'],
             ]);
 
-            // Kurangi stok item
-            // $itemData->decrement('stock_dus', $item['stock_dus'] ?? 0);
-            // $itemData->decrement('stock_rcg', $item['stock_rcg'] ?? 0);
-            // $itemData->decrement('stock_pcs', $item['stock_pcs'] ?? 0);
             $totalHarga += $jumlahPCS * $item['harga_satuan'];
             $totalItem += $jumlahPCS;
         }
@@ -147,7 +149,7 @@ class PenjualanController extends Controller
      */
     public function edit(Penjualan $penjualan)
     {
-        $items = Item::all()->where('stock', '>', 0);
+        $items = Item::all();
         return view('penjualan.edit', compact('penjualan', 'items'));
     }
 
@@ -156,66 +158,77 @@ class PenjualanController extends Controller
      */
     public function update(Request $request, Penjualan $penjualan)
     {
-        $rules = [
-            'nama_pembeli' => 'required|string',
-            'items' => 'required|array',
-            'items.*.id' => 'required|exists:items,id',
-            'items.*.jumlah' => 'required|integer|min:1',
-        ];
+        // Kembalikan stok item dari detail sebelumnya
+        foreach ($penjualan->penjualanDetails as $detail) {
+            $item = Item::find($detail->item_id);
+            $item->increment('stock_dus', $detail->jumlah_dus);
+            $item->increment('stock_rcg', $detail->jumlah_rcg);
+            $item->increment('stock_pcs', $detail->jumlah_pcs);
 
-        $message = [
-            'required' => ':attribute harus diisi',
-        ];
+            $detail->delete();
+        }
 
-        $validator = Validator::make($request->all(), $rules, $message);
+        $totalHarga = 0;
+        $totalItem = 0;
 
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withInput()->withErrors($validator)
-                ->with('danger', 'Pastikan semua field terisi');
-        } else {
-            // Hapus detail penjualan yang ada
-            foreach ($penjualan->penjualanDetails as $detail) {
-                $item = Item::find($detail->item_id);
-                $item->increment('stock', $detail->jumlah);
-                $detail->delete();
+        foreach ($request->items as $item) {
+            $itemData = Item::find($item['id']);
+
+            $jumlahPCS = 0;
+            $jumlah_dus = 0;
+            $jumlah_rcg = 0;
+            $jumlah_pcs = 0;
+
+            switch ($item['satuan']) {
+                case 'dus':
+                    $jumlah_dus = $item['jumlah'];
+                    $jumlahPCS = $item['jumlah'] * $itemData->dus_in_pcs;
+                    break;
+                case 'rcg':
+                    $jumlah_rcg = $item['jumlah'];
+                    $jumlahPCS = $item['jumlah'] * $itemData->rcg_in_pcs;
+                    break;
+                case 'pcs':
+                    $jumlah_pcs = $item['jumlah'];
+                    $jumlahPCS = $item['jumlah'];
+                    break;
             }
 
-            // Tambahkan detail item baru
-            $totalHarga = 0;
-            $totalItem = 0;
+            // Cek stok gabungan tersedia
+            $stok_tersedia = ($itemData->stock_dus * $itemData->dus_in_pcs) +
+                ($itemData->stock_rcg * $itemData->rcg_in_pcs) +
+                $itemData->stock_pcs;
 
-            foreach ($request->items as $item) {
-                $itemData = Item::find($item['id']);
-
-                if ($itemData->stock < $item['jumlah']) {
-                    return redirect()->route('penjualan.edit', $penjualan)->with('error', 'Stok item tidak mencukupi!');
-                }
-
-                $subtotal = $item['jumlah'] * $itemData->harga_jual;
-
-                PenjualanDetail::create([
-                    'penjualan_id' => $penjualan->id,
-                    'item_id' => $item['id'],
-                    'jumlah' => $item['jumlah'],
-                    'total_harga' => $subtotal,
-                ]);
-
-                // Kurangi stok item
-                $itemData->decrement('stock', $item['jumlah']);
-                $totalHarga += $subtotal;
-                $totalItem += $item['jumlah'];
+            if ($stok_tersedia < $jumlahPCS) {
+                return redirect()->route('penjualan.edit', $penjualan)->with('error', 'Stok item tidak mencukupi!');
             }
 
-            // Update total harga penjualan
-            $penjualan->update([
-                'nama_pembeli' => $request->nama_pembeli,
-                'total_harga_akhir' => $totalHarga,
-                'total_item' => $totalItem,
+            PenjualanDetail::create([
+                'penjualan_id' => $penjualan->id,
+                'item_id' => $item['id'],
+                'jumlah_dus' => $jumlah_dus,
+                'jumlah_rcg' => $jumlah_rcg,
+                'jumlah_pcs' => $jumlah_pcs,
+                'jumlah' => $jumlahPCS,
+                'harga_satuan' => $item['harga_satuan'],
             ]);
 
-            return redirect()->route('penjualan.index')->with('success', 'Penjualan berhasil diperbarui!');
+            // Kurangi stok satuan yang sesuai
+            $itemData->decrement('stock_dus', $jumlah_dus);
+            $itemData->decrement('stock_rcg', $jumlah_rcg);
+            $itemData->decrement('stock_pcs', $jumlah_pcs);
+
+            $totalHarga += $jumlahPCS * $item['harga_satuan'];
+            $totalItem += $jumlahPCS;
         }
+
+        $penjualan->update([
+            'nama_pembeli' => $request->nama_pembeli,
+            'total_harga_akhir' => $totalHarga,
+            'total_item' => $totalItem,
+        ]);
+
+        return redirect()->route('penjualan.index')->with('success', 'Penjualan berhasil diperbarui!');
     }
 
     /**
