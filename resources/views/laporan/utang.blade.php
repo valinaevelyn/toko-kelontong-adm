@@ -2,7 +2,13 @@
 
 @section('content')
     <div class="container mt-4">
-
+        <br>
+        <div class="text-start mb-3">
+            {{-- <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#inputBiayaModal">
+                Input Biaya
+            </button> --}}
+        </div>
+        <br>
         <h2 class="text-center">LAPORAN UTANG</h2>
 
         <div class="mb-3 mt-3 text-center">

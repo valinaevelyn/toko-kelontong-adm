@@ -34,10 +34,12 @@ class ItemController extends Controller
         $rules = [
             'nama' => 'required',
             'merek' => 'required',
-            'uom' => 'required',
-            'harga_jual' => 'required',
-            'harga_beli' => 'required',
-            'stock' => 'required'
+            'harga_jual' => 'required|numeric',
+            'stock_dus' => 'nullable|integer',
+            'stock_rcg' => 'nullable|integer',
+            'stock_pcs' => 'nullable|integer',
+            'dus_in_pcs' => 'nullable|integer',
+            'rcg_in_pcs' => 'nullable|integer',
         ];
 
         $message = [
@@ -54,10 +56,12 @@ class ItemController extends Controller
             Item::create([
                 'nama' => $request->input('nama'),
                 'merek' => $request->input('merek'),
-                'uom' => $request->input('uom'),
                 'harga_jual' => $request->input('harga_jual'),
-                'harga_beli' => $request->input('harga_beli'),
-                'stock' => $request->input('stock')
+                'stock_dus' => $request->input('stock_dus') ?? 0,
+                'stock_rcg' => $request->input('stock_rcg') ?? 0,
+                'stock_pcs' => $request->input('stock_pcs') ?? 0,
+                'dus_in_pcs' => $request->input('dus_in_pcs') ?? 0,
+                'rcg_in_pcs' => $request->input('rcg_in_pcs') ?? 0,
             ]);
 
             return redirect()->route('item.index')->with('success', 'Data Item berhasil disimpan');
@@ -88,33 +92,42 @@ class ItemController extends Controller
         $rules = [
             'nama' => 'required',
             'merek' => 'required',
-            'uom' => 'required',
-            'harga_jual' => 'required',
-            'harga_beli' => 'required',
-            'stock' => 'required'
+            'harga_jual' => 'required|numeric',
+            'stock_dus' => 'nullable|integer|min:0',
+            'stock_rcg' => 'nullable|integer|min:0',
+            'stock_pcs' => 'nullable|integer|min:0',
+            'dus_in_pcs' => 'nullable|integer|min:0',
+            'rcg_in_pcs' => 'nullable|integer|min:0',
         ];
 
-        $message = [
-            'required' => ':attribute harus diisi',
+        $messages = [
+            'required' => ':attribute wajib diisi.',
+            'numeric' => ':attribute harus berupa angka.',
+            'integer' => ':attribute harus bilangan bulat.',
+            'min' => ':attribute tidak boleh negatif.',
         ];
 
-        $validator = Validator::make($request->all(), $rules, $message);
+        $validator = Validator::make($request->all(), $rules, $messages);
 
         if ($validator->fails()) {
             return redirect()->back()
-                ->withInput()->withErrors($validator)
-                ->with('danger', 'Pastikan semua field terisi');
-        } else {
-            $item->nama = $request->nama;
-            $item->merek = $request->merek;
-            $item->uom = $request->uom;
-            $item->harga_jual = $request->harga_jual;
-            $item->harga_beli = $request->harga_beli;
-            $item->stock = $request->stock;
-            $item->save();
-
-            return redirect()->route('item.index')->with('success', 'Data Item berhasil diperbarui');
+                ->withInput()
+                ->withErrors($validator)
+                ->with('danger', 'Pastikan semua field terisi dengan benar.');
         }
+
+        $item->update([
+            'nama' => $request->nama,
+            'merek' => $request->merek,
+            'harga_jual' => $request->harga_jual,
+            'stock_dus' => $request->stock_dus ?? 0,
+            'stock_rcg' => $request->stock_rcg ?? 0,
+            'stock_pcs' => $request->stock_pcs ?? 0,
+            'dus_in_pcs' => $request->dus_in_pcs ?? 0,
+            'rcg_in_pcs' => $request->rcg_in_pcs ?? 0,
+        ]);
+
+        return redirect()->route('item.index')->with('success', 'Item berhasil diperbarui.');
     }
 
     /**

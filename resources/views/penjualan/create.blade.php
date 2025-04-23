@@ -34,8 +34,8 @@
                                                             @php
                                                                 $total_stock = ($item->stock_dus * $item->dus_in_pcs) + ($item->stock_rcg * $item->rcg_in_ps) + $item->stock_pcs;
                                                             @endphp
-                                                            <option value="{{ $item->id }}" data-dus-in-pcs="{{ $item->dus_in_pcs }}"
-                                                                data-rcg-in-pcs="{{ $item->rcg_in_ps }}">
+                                                            <option value="{{ $item->id }}" data-harga-jual="{{ $item->harga_jual }}"
+                                                                data-dus-in-pcs="{{ $item->dus_in_pcs }}" data-rcg-in-pcs="{{ $item->rcg_in_ps }}">
                                                                 {{ $item->nama }} (Stok: {{ $total_stock }})
                                                             </option>
                                 @endforeach
@@ -53,7 +53,9 @@
                             <input type="number" name="items[0][jumlah]" class="form-control" min="0" required>
                         </td>
                         <td>
-                            <input type="number" name="items[0][harga_satuan]" class="form-control" min="0" required>
+                            {{-- Hidden input for harga_satuan --}}
+                            <input type="hidden" name="items[0][harga_satuan]" class="harga-satuan-hidden" value="">
+                            <span class="harga-satuan-text">-</span>
                         </td>
                         <td>
                             <button type="button" class="btn btn-danger remove-item">Hapus</button>
@@ -90,7 +92,8 @@
                         <input type="number" name="items[__INDEX__][jumlah]" class="form-control" min="0" required>
                     </td>
                     <td>
-                        <input type="number" name="items[__INDEX__][harga_satuan]" class="form-control" min="0" required>
+                        <input type="hidden" name="items[__INDEX__][harga_satuan]" class="harga-satuan-hidden" value="">
+                        <span class="harga-satuan-text">-</span>
                     </td>
                     <td>
                         <button type="button" class="btn btn-danger remove-item">Hapus</button>
@@ -127,17 +130,16 @@
         let itemIndex = 1;
 
         // Fungsi untuk mengupdate nilai PCS per DUS dan RCG saat item dipilih
-        window.updatePcsValues = function (selectElement) {
-            const selectedOption = selectElement.options[selectElement.selectedIndex];
-            const pcsPerDus = selectedOption.getAttribute('data-pcs-dus');
-            const pcsPerRcg = selectedOption.getAttribute('data-pcs-rcg');
+        // window.updatePcsValues = function (selectElement) {
+        //     const selectedOption = selectElement.options[selectElement.selectedIndex];
+        //     const pcsPerDus = selectedOption.getAttribute('data-pcs-dus');
+        //     const pcsPerRcg = selectedOption.getAttribute('data-pcs-rcg');
 
-            const row = selectElement.closest('tr');
-            row.querySelector('input[name*="[dus_in_pcs]"]').value = pcsPerDus;
-            row.querySelector('input[name*="[rcg_in_pcs]"]').value = pcsPerRcg;
-        };
+        //     const row = selectElement.closest('tr');
+        //     row.querySelector('input[name*="[dus_in_pcs]"]').value = pcsPerDus;
+        //     row.querySelector('input[name*="[rcg_in_pcs]"]').value = pcsPerRcg;
+        // };
 
-        // Tambahkan baris baru dari template
         document.getElementById("addItem").addEventListener("click", function () {
             const template = document.getElementById("templateRow").innerHTML;
             const newRow = template.replace(/__INDEX__/g, itemIndex);
@@ -145,8 +147,24 @@
             itemIndex++;
         });
 
+        // Tambahkan baris baru dari template
+        // document.getElementById("addItem").addEventListener("click", function () {
+        //     const template = document.getElementById("templateRow").innerHTML;
+        //     const newRow = template.replace(/__INDEX__/g, itemIndex);
+        //     document.getElementById("itemTableBody").insertAdjacentHTML("beforeend", newRow);
+        //     itemIndex++;
+        // });
+
         // Hapus baris item
-        document.getElementById("itemTableBody").addEventListener("click", function (e) {
+        document.getElementById("itemTableBody").addEventListener("change", function (e) {
+            if (e.target.classList.contains("item-select")) {
+                const selectedOption = e.target.options[e.target.selectedIndex];
+                const hargaJual = selectedOption.getAttribute("data-harga-jual");
+                const row = e.target.closest("tr");
+                row.querySelector(".harga-satuan-hidden").value = hargaJual;
+                row.querySelector(".harga-satuan-text").innerText = hargaJual ? `Rp ${hargaJual}` : '-';
+            }
+
             if (e.target.classList.contains("remove-item")) {
                 e.target.closest("tr").remove();
             }

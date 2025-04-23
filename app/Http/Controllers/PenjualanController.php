@@ -72,6 +72,7 @@ class PenjualanController extends Controller
         // Tambahkan detail item
         foreach ($request->items as $item) {
             $itemData = Item::find($item['id']);
+            $hargaSatuan = $itemData->harga_jual;
 
             // if ($itemData->stock < $item['jumlah']) {
             //     return redirect()->route('penjualan.create')->with('error', 'Stok item tidak mencukupi!');
@@ -120,10 +121,10 @@ class PenjualanController extends Controller
                 'jumlah_rcg' => $jumlah_rcg,
                 'jumlah_pcs' => $jumlah_pcs,
                 'jumlah' => $jumlahPCS,
-                'harga_satuan' => $item['harga_satuan'],
+                'harga_satuan' => $hargaSatuan,
             ]);
 
-            $totalHarga += $jumlahPCS * $item['harga_satuan'];
+            $totalHarga += $jumlahPCS * $hargaSatuan;
             $totalItem += $jumlahPCS;
         }
 

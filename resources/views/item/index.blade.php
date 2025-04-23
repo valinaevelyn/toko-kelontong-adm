@@ -17,22 +17,22 @@
         </div>
 
         <div class="col mt-4">
-            <table class="table table-bordered table-primary text-center">
+            <table class="table table-bordered table-primary ">
                 <thead>
                     <tr>
-                        <th scope="col">Nama</th>
-                        <th scope="col">Merk</th>
+                        <th scope="col" class="text-center">Nama</th>
+                        <th scope="col" class="text-center">Merk</th>
                         {{-- <th scope="col">UOM</th> --}}
-                        <th scope="col">Harga Jual</th>
+                        <th scope="col" class="text-center">Harga Jual</th>
                         {{-- <th scope="col">Harga Beli</th> --}}
-                        <th scope="col">Stock</th>
-                        <th scope="col">Action</th>
+                        <th scope="col" class="text-center">Stock</th>
+                        <th scope="col" class="text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($items as $item)
                         @if ($item->count())
-                            <tr class="table">
+                            <tr class="table align-middle">
                                 <td>{{ $item->nama }}</td>
                                 <td>{{ $item->merek }}</td>
                                 {{-- <td>{{ $item->uom }}</td> --}}

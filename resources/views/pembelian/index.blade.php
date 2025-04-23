@@ -35,19 +35,19 @@
                 </form>
             </div>
 
-            <table class="table table-bordered table-primary text-center">
+            <table class="table table-bordered table-primary">
                 <thead>
                     <tr>
-                        <th scope="col" class="align-middle">Tanggal</th>
-                        <th scope="col" class="align-middle">Nama Supplier</th>
-                        <th scope="col" class="align-middle">Item</th>
-                        <th scope="col" class="align-middle">Total Harga</th>
-                        <th scope="col" class="align-middle">Total Item</th>
-                        <th scope="col" class="align-middle">Total Uang</th>
-                        <th scope="col" class="align-middle">Kembalian</th>
-                        <th scope="col" class="align-middle">Metode</th>
-                        <th scope="col" class="align-middle">Status</th>
-                        <th scope="col" class="align-middle">Action</th>
+                        <th scope="col" class="align-middle text-center">Tanggal</th>
+                        <th scope="col" class="align-middle text-center">Nama Supplier</th>
+                        <th scope="col" class="align-middle text-center">Item</th>
+                        <th scope="col" class="align-middle text-center">Total Harga</th>
+                        <th scope="col" class="align-middle text-center">Total Item</th>
+                        <th scope="col" class="align-middle text-center">Total Uang</th>
+                        <th scope="col" class="align-middle text-center">Kembalian</th>
+                        <th scope="col" class="align-middle text-center">Metode</th>
+                        <th scope="col" class="align-middle text-center">Status</th>
+                        <th scope="col" class="align-middle text-center">Action</th>
                     </tr>
                 </thead>
                 <tbody>
