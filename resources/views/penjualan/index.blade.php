@@ -99,6 +99,17 @@
 
                                             <li><a class="dropdown-item" href="{{ route('penjualan.edit', $penjualan->id) }}">Edit
                                                     Penjualan</a></li>
+
+                                            @CAN('supervisor')
+                                                <li>
+                                                    <form onclick="confirm('are you sure?')"
+                                                        action="{{ route('penjualan.destroy', $penjualan->id) }}" method="POST">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="dropdown-item">Delete</a>
+                                                    </form>
+                                                </li>
+                                            @endcan
                                         </ul>
                                     </div>
                                 </td>
@@ -114,62 +125,64 @@
         </div>
 
         <!-- Modal Pelunasan -->
-        <div class="modal fade" id="pelunasanModal" tabindex="-1" aria-labelledby="pelunasanModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Pelunasan Pembayaran</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="pelunasanForm" method="POST" action="{{ route('penjualan.pelunasan', $penjualan->id) }}">
-                            {{-- CSRF Token untuk keamanan --}}
-                            @csrf
-                            @method('PUT')
-                            {{-- Input hidden untuk menyimpan ID penjualan --}}
-                            <input type="hidden" id="penjualan_id">
-                            <div class="mb-3">
-                                <label class="form-label">Metode Pembayaran</label>
-                                <select class="form-control" id="metode_pembayaran" required>
-                                    <option value="CASH">Cash</option>
-                                    <option value="KREDIT">Kredit</option>
-                                    <option value="CEK">Cek</option>
-                                    <option value="TRANSFER">Transfer</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Total Harga</label>
-                                <input type="text" class="form-control" id="total_harga" readonly>
-                            </div>
-                            <div class="mb-3" id="jumlah_uang_group">
-                                <label class="form-label">Jumlah Uang</label>
-                                <input type="number" class="form-control" id="jumlah_uang">
-                            </div>
+        @if($penjualans->isNotEmpty())
+            <div class="modal fade" id="pelunasanModal" tabindex="-1" aria-labelledby="pelunasanModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Pelunasan Pembayaran</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="pelunasanForm" method="POST" action="{{ route('penjualan.pelunasan', $penjualan->id) }}">
+                                {{-- CSRF Token untuk keamanan --}}
+                                @csrf
+                                @method('PUT')
+                                {{-- Input hidden untuk menyimpan ID penjualan --}}
+                                <input type="hidden" id="penjualan_id">
+                                <div class="mb-3">
+                                    <label class="form-label">Metode Pembayaran</label>
+                                    <select class="form-control" id="metode_pembayaran" required>
+                                        <option value="CASH">Cash</option>
+                                        <option value="KREDIT">Kredit</option>
+                                        <option value="CEK">Cek</option>
+                                        <option value="TRANSFER">Transfer</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Total Harga</label>
+                                    <input type="text" class="form-control" id="total_harga" readonly>
+                                </div>
+                                <div class="mb-3" id="jumlah_uang_group">
+                                    <label class="form-label">Jumlah Uang</label>
+                                    <input type="number" class="form-control" id="jumlah_uang">
+                                </div>
 
-                            <div class="mb-3" id="cek-fields-code">
-                                <label class="form-label">Kode Cek</label>
-                                <input type="text" class="form-control" id="kode_cek">
-                            </div>
+                                <div class="mb-3" id="cek-fields-code">
+                                    <label class="form-label">Kode Cek</label>
+                                    <input type="text" class="form-control" id="kode_cek">
+                                </div>
 
-                            <div class="mb-3" id="cek-fields-date">
-                                <label class="form-label">Tanggal Cair Cek</label>
-                                <input type="date" class="form-control" id="tanggal_cair">
-                            </div>
+                                <div class="mb-3" id="cek-fields-date">
+                                    <label class="form-label">Tanggal Cair Cek</label>
+                                    <input type="date" class="form-control" id="tanggal_cair">
+                                </div>
 
-                            <div class="mb-3" id="status_saldo_group" style="display: none;">
-                                <label class="form-label">Status Saldo</label>
-                                <select class="form-control" id="status_saldo" name="status_saldo">
-                                    <option value="LUNAS">Lunas</option>
-                                    <option value="BELUM LUNAS">Belum Lunas</option>
-                                </select>
-                            </div>
+                                <div class="mb-3" id="status_saldo_group" style="display: none;">
+                                    <label class="form-label">Status Saldo</label>
+                                    <select class="form-control" id="status_saldo" name="status_saldo">
+                                        <option value="LUNAS">Lunas</option>
+                                        <option value="BELUM LUNAS">Belum Lunas</option>
+                                    </select>
+                                </div>
 
-                            <button type="submit" class="btn btn-primary">Konfirmasi</button>
-                        </form>
+                                <button type="submit" class="btn btn-primary">Konfirmasi</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        @endif
 
 
 

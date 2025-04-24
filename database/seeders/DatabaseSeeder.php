@@ -18,10 +18,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             ItemSeeder::class,
-            PenjualanSeeder::class,
-            PembelianSeeder::class,
-            PenjualanDetailSeeder::class,
-            PembelianDetailSeeder::class,
+            // PenjualanSeeder::class,
+            // PembelianSeeder::class,
+            // PenjualanDetailSeeder::class,
+            // PembelianDetailSeeder::class,
         ]);
     }
 }

@@ -203,7 +203,24 @@ class PembelianController extends Controller
      */
     public function destroy(Pembelian $pembelian)
     {
-        //
+        // Hapus detail pembelian
+        foreach ($pembelian->pembelianDetails as $detail) {
+            $item = Item::find($detail->item_id);
+
+            $item->decrement('stock_dus', $detail->jumlah_dus);
+            $item->decrement('stock_rcg', $detail->jumlah_rcg);
+            $item->decrement('stock_pcs', $detail->jumlah_pcs);
+
+            $detail->delete();
+        }
+
+        // Hapus laporan utang jika ada
+        LaporanUtang::where('pembelian_id', $pembelian->id)->delete();
+
+        // Hapus pembelian
+        $pembelian->delete();
+
+        return redirect()->route('pembelian.index')->with('success', 'Pembelian berhasil dihapus!');
     }
 
     public function pelunasan(Request $request, $id)

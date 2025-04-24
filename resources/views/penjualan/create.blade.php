@@ -67,14 +67,14 @@
             <template id="templateRow">
                 <tr>
                     <td>
-                        <select name="items[__INDEX__][id]" class="form-select" required>
+                        <select name="items[__INDEX__][id]" class="form-select item-select" required>
                             <option value="" selected disabled>Pilih Item</option>
                             @foreach($items as $item)
                                                     @php
                                                         $total_stock = ($item->stock_dus * $item->dus_in_pcs) + ($item->stock_rcg * $item->rcg_in_ps) + $item->stock_pcs;
                                                     @endphp
-                                                    <option value="{{ $item->id }}" data-pcs-dus="{{ $item->dus_in_pcs }}"
-                                                        data-pcs-rcg="{{ $item->rcg_in_ps }}">
+                                                    <option value="{{ $item->id }}" data-harga-jual="{{ $item->harga_jual }}"
+                                                        data-pcs-dus="{{ $item->dus_in_pcs }}" data-pcs-rcg="{{ $item->rcg_in_ps }}">
                                                         {{ $item->nama }} (Stok: {{ $total_stock }})
                                                     </option>
                             @endforeach
@@ -112,7 +112,7 @@
                     </td>
                     <td><input type="number" name="items[__INDEX__][harga_satuan]" class="form-control" min="1" required>
                     </td> --}}
-                    <td><button type="button" class="btn btn-danger remove-item">Hapus</button></td>
+
                 </tr>
             </template>
 
@@ -164,10 +164,13 @@
                 row.querySelector(".harga-satuan-hidden").value = hargaJual;
                 row.querySelector(".harga-satuan-text").innerText = hargaJual ? `Rp ${hargaJual}` : '-';
             }
+        });
 
+        document.getElementById("itemTableBody").addEventListener("click", function (e) {
             if (e.target.classList.contains("remove-item")) {
                 e.target.closest("tr").remove();
             }
         });
+
     });
 </script>

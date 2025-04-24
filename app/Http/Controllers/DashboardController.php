@@ -30,9 +30,24 @@ class DashboardController extends Controller
         $mutasi_dari_bank = DB::table('mutasi_saldo')->where('dari', 'BANK')->sum('jumlah');
         $mutasi_ke_bank = DB::table('mutasi_saldo')->where('ke', 'BANK')->sum('jumlah');
 
-        // Saldo akhir setelah dikurangi pembelian
-        $saldo_kas = $penjualan_kas - $mutasi_dari_kas + $mutasi_ke_kas - $pembelian_kas;
-        $saldo_bank = $penjualan_bank - $mutasi_dari_bank + $mutasi_ke_bank - $pembelian_bank;
+        // saldo dari  laporan kas
+        $laporan_kas = DB::table('laporan_kas')
+            ->select('kas_masuk', 'kas_keluar')
+            ->orderByDesc('tanggal')
+            ->first();
+        $saldo_kas = $laporan_kas ? $laporan_kas->kas_masuk - $laporan_kas->kas_keluar : 0;
+
+        $saldo_bank = DB::table('laporan_banks')
+            ->select('bank_masuk', 'bank_keluar')
+            ->orderByDesc('tanggal')
+            ->first();
+        $saldo_bank = $saldo_bank ? $saldo_bank->kas_masuk - $saldo_bank->kas_keluar : 0;
+
+
+        // Saldo akhir setelah dikurangi pembelian dan dari laporan kas
+        $saldo_kas = $saldo_kas + $penjualan_kas - $pembelian_kas + $mutasi_ke_kas - $mutasi_dari_kas;
+        $saldo_bank = $saldo_bank + $penjualan_bank - $pembelian_bank + $mutasi_ke_bank - $mutasi_dari_bank;
+
 
         // Piutang = selain CASH dan TRANSFER (penjualan dan pembelian)
         $piutang_penjualan = Penjualan::whereNotIn('metode', ['CASH', 'TRANSFER'])->where('status', 'BELUM LUNAS')->sum('total_harga_akhir');
@@ -72,6 +87,39 @@ class DashboardController extends Controller
         ));
     }
 
+    // public function transferSaldo(Request $request)
+    // {
+    //     // Hitung saldo aktual dari sumber
+    //     $asal = $request->dari;
+    //     $jumlah = $request->jumlah;
+
+    //     $saldo_asal = $asal === 'BANK'
+    //         ? Penjualan::where('metode', 'TRANSFER')->where('status', 'LUNAS')->sum('total_harga_akhir')
+    //         - DB::table('mutasi_saldo')->where('dari', 'BANK')->sum('jumlah')
+    //         + DB::table('mutasi_saldo')->where('ke', 'BANK')->sum('jumlah')
+    //         : Penjualan::where('metode', 'CASH')->where('status', 'LUNAS')->sum('total_harga_akhir')
+    //         - DB::table('mutasi_saldo')->where('dari', 'KAS')->sum('jumlah')
+    //         + DB::table('mutasi_saldo')->where('ke', 'KAS')->sum('jumlah');
+
+
+    //     if ($jumlah > $saldo_asal) {
+    //         return redirect()->back()->with('error', 'Saldo tidak mencukupi untuk transfer.');
+    //     }
+
+    //     // kalau asal
+
+    //     DB::table('mutasi_saldo')->insert([
+    //         'dari' => $asal,
+    //         'ke' => $request->ke,
+    //         'jumlah' => $jumlah,
+    //         'catatan' => $request->catatan ?? 'Transfer antar saldo',
+    //         'created_at' => now(),
+    //         'updated_at' => now(),
+    //     ]);
+
+    //     return redirect()->route('dashboard')->with('success', 'Saldo berhasil ditransfer.');
+    // }
+
     public function transferSaldo(Request $request)
     {
         $request->validate([
@@ -81,22 +129,60 @@ class DashboardController extends Controller
             'catatan' => 'nullable|string',
         ]);
 
-        // Hitung saldo aktual dari sumber
         $asal = $request->dari;
         $jumlah = $request->jumlah;
 
-        $saldo_asal = $asal === 'BANK'
-            ? Penjualan::where('metode', 'TRANSFER')->where('status', 'LUNAS')->sum('total_harga_akhir')
-            - DB::table('mutasi_saldo')->where('dari', 'BANK')->sum('jumlah')
-            + DB::table('mutasi_saldo')->where('ke', 'BANK')->sum('jumlah')
-            : Penjualan::where('metode', 'CASH')->where('status', 'LUNAS')->sum('total_harga_akhir')
-            - DB::table('mutasi_saldo')->where('dari', 'KAS')->sum('jumlah')
-            + DB::table('mutasi_saldo')->where('ke', 'KAS')->sum('jumlah');
+        // Ambil saldo awal dari laporan
+        $laporan_kas = DB::table('laporan_kas')
+            ->select('kas_masuk', 'kas_keluar')
+            ->orderByDesc('tanggal')
+            ->first();
+        $saldo_kas = $laporan_kas ? $laporan_kas->kas_masuk - $laporan_kas->kas_keluar : 0;
 
+        $laporan_bank = DB::table('laporan_banks')
+            ->select('bank_masuk', 'bank_keluar')
+            ->orderByDesc('tanggal')
+            ->first();
+        $saldo_bank = $laporan_bank ? $laporan_bank->bank_masuk - $laporan_bank->bank_keluar : 0;
+
+        // Hitung penjualan dan pembelian sesuai metode
+        // Tambahkan kondisi untuk KREDIT dan CEK pada penjualan dan pembelian
+        $penjualan_kas = Penjualan::whereIn('metode', ['CASH', 'KREDIT'])
+            ->where('status', 'LUNAS')
+            ->sum('total_harga_akhir');
+
+        $penjualan_bank = Penjualan::whereIn('metode', ['TRANSFER', 'CEK'])
+            ->where('status', 'LUNAS')
+            ->sum('total_harga_akhir');
+
+        $pembelian_kas = Pembelian::whereIn('metode', ['CASH', 'KREDIT'])
+            ->where('status', 'LUNAS')
+            ->sum('total_harga');
+
+        $pembelian_bank = Pembelian::whereIn('metode', ['TRANSFER', 'CEK'])
+            ->where('status', 'LUNAS')
+            ->sum('total_harga');
+
+        // Mutasi
+        $mutasi_dari_kas = DB::table('mutasi_saldo')->where('dari', 'KAS')->sum('jumlah');
+        $mutasi_ke_kas = DB::table('mutasi_saldo')->where('ke', 'KAS')->sum('jumlah');
+        $mutasi_dari_bank = DB::table('mutasi_saldo')->where('dari', 'BANK')->sum('jumlah');
+        $mutasi_ke_bank = DB::table('mutasi_saldo')->where('ke', 'BANK')->sum('jumlah');
+
+        // Hitung saldo aktual dari asal
+        $saldo_asal = 0;
+        if ($asal === 'BANK') {
+            $saldo_asal = $saldo_bank + $penjualan_bank - $pembelian_bank + $mutasi_ke_bank - $mutasi_dari_bank;
+        } else {
+            $saldo_asal = $saldo_kas + $penjualan_kas - $pembelian_kas + $mutasi_ke_kas - $mutasi_dari_kas;
+        }
+
+        // Periksa apakah saldo mencukupi untuk transfer
         if ($jumlah > $saldo_asal) {
             return redirect()->back()->with('error', 'Saldo tidak mencukupi untuk transfer.');
         }
 
+        // Catat transfer
         DB::table('mutasi_saldo')->insert([
             'dari' => $asal,
             'ke' => $request->ke,
@@ -106,6 +192,6 @@ class DashboardController extends Controller
             'updated_at' => now(),
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Saldo berhasil ditransfer.');
+        return redirect()->route('dashboard')->with('success', "Saldo berhasil ditransfer dari $asal ke " . $request->ke . ".");
     }
 }

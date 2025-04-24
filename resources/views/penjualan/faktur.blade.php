@@ -33,26 +33,36 @@
                 <table class="table table-bordered table-striped">
                     <thead class="table-primary">
                         <tr>
-                            <th>Item</th>
-                            <th>Jumlah</th>
-                            <th>Harga Satuan</th>
-                            <th>Total</th>
+                            <th scope="col">Nama Item</th>
+                            <th scope="col">Jumlah Item</th>
+                            <th scope="col">Harga Satuan</th>
+                            <th scope="col">Sub Total</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($penjualan->penjualanDetails as $detail)
-                            <tr>
-                                <td>{{ $detail->item->nama }}</td>
-                                <td>{{ $detail->jumlah }}</td>
-                                <td>{{ 'Rp ' . number_format($detail->item->harga_jual, 0, ',', '.') }}</td>
-                                <td>{{ 'Rp ' . number_format($detail->total_harga, 0, ',', '.') }}</td>
-                            </tr>
+                        @php $totalHarga = 0; @endphp
+                        @foreach ($penjualan->penjualanDetails as $detail)
+                                            @php
+                                                $subtotal = $detail->total_harga;
+                                                $totalHarga += $subtotal;
+                                            @endphp
+                                            <tr class="table">
+                                                <td>{{ $detail->item->nama }}</td>
+                                                <td>
+                                                    @if($detail->jumlah_dus) <strong>{{ $detail->jumlah_dus }} dus</strong><br> @endif
+                                                    @if($detail->jumlah_rcg) <strong>{{ $detail->jumlah_rcg }} renceng</strong><br> @endif
+                                                    @if($detail->jumlah_pcs) <strong>{{ $detail->jumlah_pcs }} pcs</strong> @endif
+                                                </td>
+                                                <td>{{ 'Rp ' . number_format($detail->harga_satuan, 0, ',', '.') }}</td>
+                                                <td>{{ 'Rp ' . number_format(($detail->jumlah_dus * $detail->item->dus_in_pcs * $detail->harga_satuan) + ($detail->jumlah_rcg * $detail->item->rcg_in_pcs * $detail->harga_satuan) + (($detail->jumlah_pcs * $detail->harga_satuan)), 0, ',', '.') }}
+                                                </td>
+                                            </tr>
                         @endforeach
                     </tbody>
                     <tfoot class="table-secondary">
                         <tr>
                             <td colspan="3" class="text-end"><strong>Total Harga:</strong></td>
-                            <td><strong>{{ 'Rp ' . number_format($penjualan->penjualanDetails->sum('total_harga'), 0, ',', '.') }}</strong>
+                            <td><strong>{{ 'Rp ' . number_format($penjualan->total_harga_akhir, 0, ',', '.') }}</strong>
                             </td>
                         </tr>
                         <tr>
