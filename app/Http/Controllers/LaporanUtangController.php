@@ -27,7 +27,7 @@ class LaporanUtangController extends Controller
 
         // Query untuk laporan utang, hanya dari pembelian
         $laporanUtang =
-            Pembelian::whereIn('metode', ['CEK', 'KREDIT'])
+            Pembelian::whereIn('metode', ['CEK', 'KREDIT', ''])
                 ->where('status', 'BELUM LUNAS')
                 ->select(
                     'tanggal_pembelian as tanggal',

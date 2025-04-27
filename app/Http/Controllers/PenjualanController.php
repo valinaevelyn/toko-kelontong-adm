@@ -342,7 +342,9 @@ class PenjualanController extends Controller
             'nama_pembeli' => $request->nama_pembeli,
             'total_harga_akhir' => $totalHarga,
             'total_item' => $totalItem,
+            'tanggal_penjualan' => $request->tanggal_penjualan
         ]);
+
 
         return redirect()->route('penjualan.index')->with('success', 'Penjualan berhasil diperbarui!');
     }
@@ -371,12 +373,6 @@ class PenjualanController extends Controller
 
     public function pelunasan(Request $request, $id)
     {
-        $request->validate([
-            'jumlah_uang' => 'nullable|required_if:metode_pembayaran,CASH|numeric|min:0',
-            'metode_pembayaran' => 'required|in:CASH,KREDIT,CEK,TRANSFER',
-            'kode_cek' => 'required_if:metode_pembayaran,CEK|string|nullable',
-            'tanggal_cair' => 'required_if:metode_pembayaran,CEK|date|nullable',
-        ]);
 
         $penjualan = Penjualan::findOrFail($id);
         $totalHarga = $penjualan->total_harga_akhir;

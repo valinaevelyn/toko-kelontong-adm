@@ -28,7 +28,7 @@ class LaporanPiutangController extends Controller
 
         // Query untuk laporan piutang, hanya dari penjualan
         $laporanPiutang =
-            Penjualan::whereIn('metode', ['CEK', 'KREDIT'])
+            Penjualan::whereIn('metode', ['CEK', 'KREDIT', ''])
                 ->where('status', 'BELUM LUNAS')
                 ->select(
                     'tanggal_penjualan as tanggal',
