@@ -31,7 +31,11 @@
                         <option value="BELUM LUNAS" {{ request('status') == 'BELUM LUNAS' ? 'selected' : '' }}>BELUM LUNAS
                         </option>
                     </select>
-                    <noscript><button type="submit" class="btn btn-primary">Filter</button></noscript>
+
+                    <input type="text" name="search" class="form-control me-2" placeholder="Cari pembelian..."
+                        value="{{ request('search') }}">
+
+                    <button type="submit" class="btn btn-primary">Cari</button>
                 </form>
             </div>
 

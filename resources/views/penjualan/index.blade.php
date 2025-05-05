@@ -25,13 +25,20 @@
         <div class="col mt-4">
             <div class="d-flex justify-content-start mb-3">
                 <form action="{{ route('penjualan.index') }}" method="GET" class="d-flex">
+                    <!-- Filter Status -->
                     <select name="status" class="form-select me-2" onchange="this.form.submit()">
                         <option value="">Semua Status</option>
                         <option value="LUNAS" {{ request('status') == 'LUNAS' ? 'selected' : '' }}>LUNAS</option>
                         <option value="BELUM LUNAS" {{ request('status') == 'BELUM LUNAS' ? 'selected' : '' }}>BELUM LUNAS
                         </option>
                     </select>
-                    <noscript><button type="submit" class="btn btn-primary">Filter</button></noscript>
+
+                    <!-- Search Field -->
+                    <input type="text" name="search" class="form-control me-2" placeholder="Cari penjualan..."
+                        value="{{ request('search') }}">
+
+                    <!-- Submit Button (For Non-JavaScript Browsers) -->
+                    <button type="submit" class="btn btn-primary">Cari</button>
                 </form>
             </div>
 

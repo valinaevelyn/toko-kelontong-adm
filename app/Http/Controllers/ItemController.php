@@ -11,10 +11,18 @@ class ItemController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // $items = Item::all();
-        $items = Item::paginate(10);
+        $query = Item::query();
+
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where('nama', 'like', "%$search%")
+                ->orWhere('merek', 'like', "%$search%");
+        }
+
+        $items = $query->orderBy('nama')->paginate(10);
+
         return view('item.index', compact('items'));
     }
 

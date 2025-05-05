@@ -11,8 +11,19 @@
         <div class="col">
             @include('partials.danger')
             @include('partials.success')
-            <div class="d-flex col mr-0  justify-content-end">
-                <a href="{{ route('item.create') }}" class="btn btn-success">Tambah Item</a>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <form action="{{ route('item.index') }}" method="GET" class="d-flex">
+                        <input type="text" name="search" class="form-control me-2" placeholder="Cari nama atau merk..."
+                            value="{{ request('search') }}">
+                        <button type="submit" class="btn btn-primary">Cari</button>
+                    </form>
+                </div>
+
+                <div class="d-flex col justify-content-end">
+                    <a href="{{ route('item.create') }}" class="btn btn-success">Tambah Item</a>
+                </div>
             </div>
         </div>
 

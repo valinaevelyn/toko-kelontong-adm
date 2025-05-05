@@ -13,7 +13,6 @@ class LaporanPiutangController extends Controller
 {
     public function index(Request $request)
     {
-        // Ambil parameter bulan dari request
         $bulan = $request->input('bulan');
         $tanggalFilter = $request->input('tanggal');
 
@@ -29,7 +28,7 @@ class LaporanPiutangController extends Controller
         // Query untuk laporan piutang, hanya dari penjualan
         $laporanPiutang =
             Penjualan::whereIn('metode', ['CEK', 'KREDIT', ''])
-                ->where('status', 'BELUM LUNAS')
+                // ->where('status', 'BELUM LUNAS')
                 ->select(
                     'tanggal_penjualan as tanggal',
                     'nama_pembeli as nama',
@@ -59,18 +58,21 @@ class LaporanPiutangController extends Controller
             $jatuhTempo = $tanggalPenjualan->copy()->addDays(14);
             $item->jatuh_tempo = $jatuhTempo;
 
-            if (!is_null($item->tanggal_cair)) {
-                // Jika sudah ada tanggal cair, status terlambat harus "Sudah lunas"
-                $item->status_terlambat = 'Sudah lunas';
+            // Jika status adalah 'LUNAS', langsung set status keterlambatan ke 'LUNAS'
+            if ($item->status === 'LUNAS') {
+                $item->status_terlambat = 'LUNAS';
             } else {
                 // Jika belum cair, hitung keterlambatannya
-                if (now()->greaterThan($jatuhTempo)) {
-                    // Gunakan round() atau floor() untuk membulatkan hasil
-                    $selisih = now()->diffInDays($jatuhTempo);
-                    // Gunakan round() atau floor() di sini:
-                    $item->status_terlambat = abs(round($selisih));  // Membulatkan ke angka terdekat
+                if (!is_null($item->tanggal_cair)) {
+                    $item->status_terlambat = 'Sudah lunas'; // Jika sudah cair, status terlambat harus 'Sudah lunas'
                 } else {
-                    $item->status_terlambat = 'Belum jatuh tempo';
+                    // Jika belum cair, hitung keterlambatannya
+                    if (now()->greaterThan($jatuhTempo)) {
+                        $selisih = now()->diffInDays($jatuhTempo);
+                        $item->status_terlambat = abs(round($selisih));  // Membulatkan ke angka terdekat
+                    } else {
+                        $item->status_terlambat = 'Belum jatuh tempo';
+                    }
                 }
             }
         }

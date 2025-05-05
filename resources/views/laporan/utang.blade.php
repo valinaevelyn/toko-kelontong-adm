@@ -19,14 +19,14 @@
                         <select name="bulan" class="form-select" required>
                             <option value="ALL" {{ request('bulan') == 'ALL' ? 'selected' : '' }}>ALL</option>
                             @for ($i = 0; $i < 12; $i++)
-                                                    @php
-                                                        $date = now()->startOfYear()->addMonths($i);
-                                                        $value = $date->format('Y-m');
-                                                        $label = $date->translatedFormat('F Y');
-                                                    @endphp
-                                                    <option value="{{ $value }}" {{ request('bulan') == $value ? 'selected' : '' }}>
-                                                        {{ $label }}
-                                                    </option>
+                                @php
+                                    $date = now()->startOfYear()->addMonths($i);
+                                    $value = $date->format('Y-m');
+                                    $label = $date->translatedFormat('F Y');
+                                @endphp
+                                <option value="{{ $value }}" {{ request('bulan') == $value ? 'selected' : '' }}>
+                                    {{ $label }}
+                                </option>
                             @endfor
                         </select>
                     </div>
@@ -68,12 +68,13 @@
                             <td>
                                 @if($item->status_terlambat === 'Belum jatuh tempo')
                                     {{ $item->status_terlambat }}
-                                @elseif($item->status_terlambat === 'Sudah lunas')
+                                @elseif($item->status_terlambat === 'Sudah lunas' || $item->status_terlambat === 'LUNAS')
                                     {{ $item->status_terlambat }}
                                 @else
                                     {{ $item->status_terlambat }} Hari Terlambat
                                 @endif
                             </td>
+
                         </tr>
                     @endforeach
                 </tbody>

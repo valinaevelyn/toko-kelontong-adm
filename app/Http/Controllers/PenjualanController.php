@@ -18,14 +18,32 @@ class PenjualanController extends Controller
      */
     public function index(Request $request)
     {
+        // Mulai query penjualan dengan relasi penjualanDetails dan item
         $query = Penjualan::with('penjualanDetails.item')->latest();
 
+        // Filter berdasarkan status jika ada di request
         if ($request->has('status') && in_array($request->status, ['LUNAS', 'BELUM LUNAS'])) {
             $query->where('status', $request->status);
         }
 
+        // Pencarian berdasarkan nama pembeli atau nama item
+        if ($request->has('search') && $request->search != '') {
+            $query->where(function ($q) use ($request) {
+                // Pencarian pada nama pembeli
+                $q->where('nama_pembeli', 'like', '%' . $request->search . '%')
+                    // Pencarian pada nama item yang terkait dengan penjualanDetails
+                    ->orWhereHas('penjualanDetails', function ($query) use ($request) {
+                        $query->whereHas('item', function ($q) use ($request) {
+                            $q->where('nama', 'like', '%' . $request->search . '%');
+                        });
+                    });
+            });
+        }
+
+        // Ambil data penjualan dengan pagination
         $penjualans = $query->paginate(10);
 
+        // Kembalikan data ke view
         return view('penjualan.index', compact('penjualans'));
     }
 

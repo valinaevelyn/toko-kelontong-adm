@@ -20,13 +20,28 @@ class PembelianController extends Controller
     {
         $query = Pembelian::with('pembelianDetails.item')->latest();
 
+        // Filter berdasarkan status
         if ($request->has('status') && in_array($request->status, ['LUNAS', 'BELUM LUNAS'])) {
             $query->where('status', $request->status);
         }
 
+        // Pencarian berdasarkan nama supplier atau nama item
+        if ($request->has('search') && $request->search != '') {
+            $query->where(function ($q) use ($request) {
+                $q->where('nama_supplier', 'like', '%' . $request->search . '%')
+                    ->orWhereHas('pembelianDetails', function ($query) use ($request) {
+                        $query->whereHas('item', function ($q) use ($request) {
+                            $q->where('nama', 'like', '%' . $request->search . '%');
+                        });
+                    });
+            });
+        }
+
+        // Ambil data pembelian dengan pagination
         $pembelians = $query->paginate(10);
 
-        return view('pembelian.index', data: compact('pembelians'));
+        // Mengembalikan view dengan data pembelian dan filter status serta pencarian
+        return view('pembelian.index', compact('pembelians'));
     }
 
     /**

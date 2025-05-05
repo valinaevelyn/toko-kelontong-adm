@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Item;
 use App\Models\Pembelian;
 use App\Models\Penjualan;
 use Illuminate\Http\Request;
@@ -76,6 +77,8 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $items_kurang = Item::whereRaw('(stock_dus * dus_in_pcs + stock_rcg * rcg_in_pcs + stock_pcs) < 10')->get();
+
         return view('index', compact(
             'total_pendapatan',
             'total_pengeluaran',
@@ -83,7 +86,8 @@ class DashboardController extends Controller
             'keuntungan_bersih',
             'saldo_bank',
             'transaksi_terbaru',
-            'saldo_piutang'
+            'saldo_piutang',
+            'items_kurang'
         ));
     }
 

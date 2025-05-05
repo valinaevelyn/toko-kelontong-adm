@@ -16,6 +16,7 @@ class LaporanUtangController extends Controller
         $bulan = $request->input('bulan');
         $tanggalFilter = $request->input('tanggal');
 
+        // Penanganan bulan dan tahun
         if (!empty($bulan) && $bulan !== 'ALL') {
             $date = Carbon::createFromFormat('Y-m', $bulan);
             $year = $date->year;
@@ -26,50 +27,54 @@ class LaporanUtangController extends Controller
         }
 
         // Query untuk laporan utang, hanya dari pembelian
-        $laporanUtang =
-            Pembelian::whereIn('metode', ['CEK', 'KREDIT', ''])
-                ->where('status', 'BELUM LUNAS')
-                ->select(
-                    'tanggal_pembelian as tanggal',
-                    'nama_supplier as nama',
-                    DB::raw("CASE metode WHEN 'KREDIT' THEN 'KREDIT' WHEN 'CEK' THEN 'CEK' ELSE 'LAINNYA' END as keterangan"),
-                    'total_harga as jumlah_utang',
-                    'kode_cek',
-                    'status',
-                    'tanggal_cair'
-                )
-                ->whereNull('tanggal_cair');  // Utang yang belum dibayar
+        $laporanUtang = Pembelian::whereIn('metode', ['CEK', 'KREDIT', ''])
+            ->select(
+                'tanggal_pembelian as tanggal',
+                'nama_supplier as nama',
+                DB::raw("CASE metode WHEN 'KREDIT' THEN 'KREDIT' WHEN 'CEK' THEN 'CEK' ELSE 'LAINNYA' END as keterangan"),
+                'total_harga as jumlah_utang',
+                'kode_cek',
+                'status',
+                'tanggal_cair'
+            )
+            ->whereNull('tanggal_cair');  // Utang yang belum dibayar
 
+        // Filter berdasarkan bulan dan tahun
         if ($year && $month) {
             $laporanUtang = $laporanUtang->whereYear('tanggal_pembelian', $year)
                 ->whereMonth('tanggal_pembelian', $month);
         }
 
+        // Filter berdasarkan tanggal jika ada
         if (!empty($tanggalFilter)) {
             $laporanUtang = $laporanUtang->whereDate('tanggal_pembelian', $tanggalFilter);
         }
 
-        $laporanUtang = $laporanUtang->orderBy('tanggal_pembelian')
-            ->get();
+        $laporanUtang = $laporanUtang->orderBy('tanggal_pembelian')->get();
 
         // Tentukan status keterlambatan berdasarkan tanggal jatuh tempo dan tanggal cair
         foreach ($laporanUtang as $item) {
             $tanggalPembelian = Carbon::parse($item->tanggal); // tanggal terbit
-            $jatuhTempo = $tanggalPembelian->copy()->addDays(14);
+            $jatuhTempo = $tanggalPembelian->copy()->addDays(14);  // Jatuh tempo 14 hari setelah tanggal pembelian
             $item->jatuh_tempo = $jatuhTempo;
 
-            if (!is_null($item->tanggal_cair)) {
-                // Jika sudah ada tanggal cair, status terlambat harus "Sudah lunas"
-                $item->status_terlambat = 'Sudah lunas';
+            // Jika status pembelian adalah 'LUNAS'
+            if ($item->status == 'LUNAS') {
+                $item->status_terlambat = 'LUNAS'; // Status keterlambatan langsung 'LUNAS'
             } else {
-                // Jika belum cair, hitung keterlambatannya
-                if (now()->greaterThan($jatuhTempo)) {
-                    // Gunakan round() atau floor() untuk membulatkan hasil
-                    $selisih = now()->diffInDays($jatuhTempo);
-                    // Gunakan round() atau floor() di sini:
-                    $item->status_terlambat = abs(round($selisih));  // Membulatkan ke angka terdekat
+                // Jika belum 'LUNAS', hitung keterlambatannya
+                if (!is_null($item->tanggal_cair)) {
+                    // Jika sudah ada tanggal cair, status terlambat harus "Sudah lunas"
+                    $item->status_terlambat = 'Sudah lunas';
                 } else {
-                    $item->status_terlambat = 'Belum jatuh tempo';
+                    // Jika belum cair, hitung keterlambatannya
+                    if (now()->greaterThan($jatuhTempo)) {
+                        // Hitung keterlambatan
+                        $selisih = now()->diffInDays($jatuhTempo);
+                        $item->status_terlambat = abs(round($selisih));  // Membulatkan ke angka terdekat
+                    } else {
+                        $item->status_terlambat = 'Belum jatuh tempo';
+                    }
                 }
             }
         }

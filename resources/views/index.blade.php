@@ -186,5 +186,47 @@
         </tbody>
     </table>
 
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h3">Barang yang Perlu Dibeli</h1>
+    </div>
+
+    @if($items_kurang->count() > 0)
+        <table class="table">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nama Barang</th>
+                    <th>Merek</th>
+                    <th>Stok Tersedia (pcs)</th>
+                    <th>Minimal Stok</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($items_kurang as $item)
+                    @php
+                        $stok_pcs = ($item->stock_dus * $item->dus_in_pcs) + ($item->stock_rcg * $item->rcg_in_pcs) + $item->stock_pcs;
+                    @endphp
+                    <tr>
+                        <td>{{ $item->nama }}</td>
+                        <td>{{ $item->merek }}</td>
+                        <td>{{ $stok_pcs }} pcs</td>
+                        <td>10 pcs</td>
+                        <td>
+                            @if($stok_pcs <= 5)
+                                <span class="badge bg-danger">Sangat Menipis</span>
+                            @else
+                                <span class="badge bg-warning text-dark">Perlu Restock</span>
+                            @endif
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @else
+        <div class="alert alert-success" role="alert">
+            Semua stok aman! 👍
+        </div>
+    @endif
+
 
 @endsection
