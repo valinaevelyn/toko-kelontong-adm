@@ -14,13 +14,13 @@
             <div class="mb-4 mt-4">
                 <label class="form-label">Tanggal Penjualan</label>
                 <input type="date" name="tanggal_penjualan" class="form-control"
-                    value="{{ old('tanggal_penjualan', $penjualan->tanggal_penjualan) }}" disabled>
+                    value="{{ old('tanggal_penjualan', $penjualan->tanggal_penjualan) }}" readonly>
             </div>
 
             <div class="mb-4 mt-4">
                 <label class="form-label">Nama Pembeli</label>
                 <input type="text" name="nama_pembeli" class="form-control"
-                    value="{{ old('nama_pembeli', $penjualan->nama_pembeli) }}" disabled>
+                    value="{{ old('nama_pembeli', $penjualan->nama_pembeli) }}" readonly>
             </div>
 
             <h4>Items</h4>
@@ -101,10 +101,10 @@
                             <option value="" selected disabled>Pilih Item</option>
                             @foreach($items as $item)
                                                     @php
-                                                        $total_stock = ($item->stock_dus * $item->dus_in_pcs) + ($item->stock_rcg * $item->rcg_in_ps) + $item->stock_pcs;
+                                                        $total_stock = ($item->stock_dus * $item->dus_in_pcs) + ($item->stock_rcg * $item->rcg_in_pcs) + $item->stock_pcs;
                                                     @endphp
                                                     <option value="{{ $item->id }}" data-pcs-dus="{{ $item->dus_in_pcs }}"
-                                                        data-pcs-rcg="{{ $item->rcg_in_ps }}">
+                                                        data-pcs-rcg="{{ $item->rcg_in_pcs }}">
                                                         {{ $item->nama }} (Stok: {{ $total_stock }})
                                                     </option>
                             @endforeach

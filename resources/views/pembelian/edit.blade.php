@@ -15,13 +15,13 @@
             <div class="mb-4 mt-4">
                 <label class="form-label">Tanggal Pembelian</label>
                 <input type="date" name="tanggal_pembelian" class="form-control"
-                    value="{{ old('tanggal_pembelian', $pembelian->tanggal_pembelian) }}" disabled>
+                    value="{{ old('tanggal_pembelian', $pembelian->tanggal_pembelian) }}" readonly>
             </div>
 
             <div class="mb-4 mt-4">
                 <label class="form-label">Nama Supplier</label>
                 <input type="text" name="nama_supplier" class="form-control"
-                    value="{{ old('nama_supplier', $pembelian->nama_supplier) }}" disabled>
+                    value="{{ old('nama_supplier', $pembelian->nama_supplier) }}" readonly>
             </div>
 
             <h4>Items</h4>
