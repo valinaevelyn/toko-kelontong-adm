@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('nama');
             $table->string('merek');
+            $table->string('kategori');
             // $table->string('uom');
             $table->integer('harga_jual');
             // $table->integer('harga_beli');

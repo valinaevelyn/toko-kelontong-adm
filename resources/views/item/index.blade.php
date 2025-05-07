@@ -33,6 +33,7 @@
                     <tr>
                         <th scope="col" class="text-center">Nama</th>
                         <th scope="col" class="text-center">Merk</th>
+                        <th scope="col" class="text-center">Kategori</th>
                         {{-- <th scope="col">UOM</th> --}}
                         <th scope="col" class="text-center">Harga Jual</th>
                         {{-- <th scope="col">Harga Beli</th> --}}
@@ -46,13 +47,35 @@
                             <tr class="table align-middle">
                                 <td>{{ $item->nama }}</td>
                                 <td>{{ $item->merek }}</td>
+                                <td>{{ $item->kategori }}</td>
+                                {{-- <td>{{ $item->uom }}</td> --}}
                                 {{-- <td>{{ $item->uom }}</td> --}}
                                 <td>{{ $item->harga_jual }}</td>
                                 {{-- <td>{{ $item->harga_beli }}</td> --}}
-                                <td> @if($item->stock_dus) <strong>{{ $item->stock_dus }} dus</strong><br> @endif
-                                    @if($item->stock_rcg) <strong>{{ $item->stock_rcg }} renceng</strong><br> @endif
-                                    @if($item->stock_pcs) <strong>{{ $item->stock_pcs }} pcs</strong> @endif
+                                <td>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <select class="form-select form-select-sm satuan-select" onchange="updateStockDisplay(this)"
+                                            style="width: 120px;">
+                                            <option value="dus">Dus</option>
+                                            <option value="rcg">Renceng</option>
+                                            <option value="pcs" selected>PCS</option>
+                                        </select>
+                                        <span class="stock-display fs-6">
+                                            {{ $item->stock_pcs }} pcs
+                                        </span>
+                                    </div>
+                                    <div class="d-none stock-dus">
+                                        {{ $item->stock_dus ?? 0 }} dus
+                                    </div>
+                                    <div class="d-none stock-rcg">
+                                        {{ $item->stock_rcg ?? 0 }} renceng
+                                    </div>
+                                    <div class="d-none stock-pcs">
+                                        {{ $item->stock_pcs ?? 0 }} pcs
+                                    </div>
                                 </td>
+
+
                                 <td>
                                     <div class="dropdown d-flex justify-content-center">
                                         <button class="btn btn-primary btn-sm dropdown-toggle" type="button"
@@ -131,3 +154,23 @@
     </div>
 
 @endsection
+
+<script>
+    function updateStockDisplay(selectElement) {
+        const parent = selectElement.closest('td');
+        const stockDisplay = parent.querySelector('.stock-display');
+        const selectedUnit = selectElement.value;
+
+        const dusStock = parent.querySelector('.stock-dus')?.textContent.trim();
+        const rcgStock = parent.querySelector('.stock-rcg')?.textContent.trim();
+        const pcsStock = parent.querySelector('.stock-pcs')?.textContent.trim();
+
+        if (selectedUnit === 'dus') {
+            stockDisplay.textContent = dusStock;
+        } else if (selectedUnit === 'rcg') {
+            stockDisplay.textContent = rcgStock;
+        } else if (selectedUnit === 'pcs') {
+            stockDisplay.textContent = pcsStock;
+        }
+    }
+</script>

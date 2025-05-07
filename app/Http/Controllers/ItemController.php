@@ -18,7 +18,8 @@ class ItemController extends Controller
         if ($request->has('search') && $request->search != '') {
             $search = $request->search;
             $query->where('nama', 'like', "%$search%")
-                ->orWhere('merek', 'like', "%$search%");
+                ->orWhere('merek', 'like', "%$search%")
+                ->orWhere('kategori', 'like', "%$search%");
         }
 
         $items = $query->orderBy('nama')->paginate(10);
@@ -42,12 +43,15 @@ class ItemController extends Controller
         $rules = [
             'nama' => 'required',
             'merek' => 'required',
+            'kategori' => 'required',
             'harga_jual' => 'required|numeric',
             'stock_dus' => 'nullable|integer',
             'stock_rcg' => 'nullable|integer',
             'stock_pcs' => 'nullable|integer',
             'dus_in_pcs' => 'nullable|integer',
             'rcg_in_pcs' => 'nullable|integer',
+
+
         ];
 
         $message = [
@@ -64,6 +68,7 @@ class ItemController extends Controller
             Item::create([
                 'nama' => $request->input('nama'),
                 'merek' => $request->input('merek'),
+                'kategori' => $request->input('kategori'),
                 'harga_jual' => $request->input('harga_jual'),
                 'stock_dus' => $request->input('stock_dus') ?? 0,
                 'stock_rcg' => $request->input('stock_rcg') ?? 0,
@@ -100,6 +105,7 @@ class ItemController extends Controller
         $rules = [
             'nama' => 'required',
             'merek' => 'required',
+            'kategori' => 'required',
             'harga_jual' => 'required|numeric',
             'stock_dus' => 'nullable|integer|min:0',
             'stock_rcg' => 'nullable|integer|min:0',
@@ -127,6 +133,7 @@ class ItemController extends Controller
         $item->update([
             'nama' => $request->nama,
             'merek' => $request->merek,
+            'kategori' => $request->kategori,
             'harga_jual' => $request->harga_jual,
             'stock_dus' => $request->stock_dus ?? 0,
             'stock_rcg' => $request->stock_rcg ?? 0,

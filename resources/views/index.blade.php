@@ -228,5 +228,47 @@
         </div>
     @endif
 
+    <div class="row mt-5">
+        <div class="col-12">
+            <h4>Piutang Jatuh Tempo</h4>
+            @if($piutangJatuhTempo->count() > 0)
+                <div class="table-responsive">
+                    <table class="table table-bordered text-center">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Nama</th>
+                                <th>Keterangan</th>
+                                <th>Jumlah Piutang</th>
+                                <th>Tanggal Jatuh Tempo</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($piutangJatuhTempo as $piutang)
+                                @php
+                                    $tanggalPenjualan = \Carbon\Carbon::parse($piutang->tanggal_penjualan);
+                                    $jatuhTempo = $tanggalPenjualan->copy()->addDays(14);
+                                    $terlambat = now()->diffInDays($jatuhTempo);
+                                @endphp
+                                <tr>
+                                    <td>{{ $tanggalPenjualan->format('d-m-Y') }}</td>
+                                    <td>{{ $piutang->nama_pembeli }}</td>
+                                    <td>{{ $piutang->metode ?: 'LAINNYA' }}</td>
+                                    <td>{{ 'Rp ' . number_format($piutang->total_harga_akhir, 0, ',', '.') }}</td>
+                                    <td>{{ $jatuhTempo->format('d-m-Y') }}</td>
+                                    <td class="text-danger">{{ $terlambat }} Hari Terlambat</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <p class="text-muted">Tidak ada piutang yang jatuh tempo.</p>
+            @endif
+        </div>
+    </div>
+
+
 
 @endsection

@@ -99,7 +99,7 @@
                                                     </a></li>
                                             @endif
 
-                                            @if($penjualan->status == 'LUNAS')
+                                            @if($penjualan->status == 'LUNAS' || ($penjualan->status == 'BELUM LUNAS' && $penjualan->metode == 'KREDIT') || $penjualan->metode == 'CEK')
                                                 <li><a class="dropdown-item" href="{{ route('penjualan.faktur', $penjualan->id) }}"
                                                         target="_blank">Cetak Faktur</a></li>
                                             @endif

@@ -43,6 +43,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'DESAKU BAWANG PUTIH (8 Pack x 2 Rcg x 12 Pcs)',
             'merek' => 'PT. CITRA SATRIA UTAMA',
+            'kategori' => 'Bumbu',
             'stock_dus' => 1,
             'stock_rcg' => 16,
             'stock_pcs' => 192,
@@ -54,6 +55,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'DESAKU KUNYIT Rp. 1000 (18 Pack x 2 Rcg x 12 Pcs)',
             'merek' => 'PT. CITRA SATRIA UTAMA',
+            'kategori' => 'Bumbu',
             'stock_dus' => 1,
             'stock_rcg' => 36,
             'stock_pcs' => 432,
@@ -65,6 +67,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'LADAKU RP 1.000 ( 8 PACK X 6 RCG X 12 PCS)',
             'merek' => 'PT. CITRA SATRIA UTAMA',
+            'kategori' => 'Bumbu',
             'stock_dus' => 1,
             'stock_rcg' => 48,
             'stock_pcs' => 576,
@@ -76,6 +79,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'LIQDISHW MAMA JERUK NIPIS POUCH 680 ML',
             'merek' => 'PT.SRIWIJAYA DISTRIBUSINDO',
+            'kategori' => 'Pembersih',
             'stock_dus' => 1,
             'stock_rcg' => 0,
             'stock_pcs' => 12,
@@ -87,6 +91,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'ZINC SHAMPOO ACTIVE FRESH DB SCT 10 ML',
             'merek' => 'PT.SRIWIJAYA DISTRIBUSINDO',
+            'kategori' => 'Pembersih',
             'stock_dus' => 1,
             'stock_rcg' => 21,
             'stock_pcs' => 252,
@@ -98,6 +103,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'RAPIKA UNGU PCH 300 ML',
             'merek' => 'PT.SRIWIJAYA DISTRIBUSINDO',
+            'kategori' => 'Pembersih',
             'stock_dus' => 1,
             'stock_rcg' => 0,
             'stock_pcs' => 12,
@@ -109,6 +115,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'SOKLIN LIQUID DET ANTI BAC SCT 20ML R12',
             'merek' => 'PT.SRIWIJAYA DISTRIBUSINDO',
+            'kategori' => 'Pembersih',
             'stock_dus' => 1,
             'stock_rcg' => 10,
             'stock_pcs' => 120,
@@ -120,6 +127,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'SOKLIN LIQUID DET PERFUME SCT 20ML R12',
             'merek' => 'PT.SRIWIJAYA DISTRIBUSINDO',
+            'kategori' => 'Pembersih',
             'stock_dus' => 1,
             'stock_rcg' => 10,
             'stock_pcs' => 120,
@@ -131,6 +139,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'SOKLIN LIQUID DET SOFT SCT 20ML R12',
             'merek' => 'PT.SRIWIJAYA DISTRIBUSINDO',
+            'kategori' => 'Pembersih',
             'stock_dus' => 1,
             'stock_rcg' => 10,
             'stock_pcs' => 120,
@@ -142,6 +151,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'SOKLIN LIQUID VIOLET SOFT SCT 20ML R12',
             'merek' => 'PT.SRIWIJAYA DISTRIBUSINDO',
+            'kategori' => 'Pembersih',
             'stock_dus' => 1,
             'stock_rcg' => 10,
             'stock_pcs' => 120,
@@ -153,6 +163,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'SEDAAP MIE SINGAPORE SPICY LAKSA 83GR',
             'merek' => 'PT.SRIWIJAYA DISTRIBUSINDO',
+            'kategori' => 'Makanan',
             'stock_dus' => 1,
             'stock_rcg' => 0,
             'stock_pcs' => 40,
@@ -164,6 +175,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'ROYALE SWEET FLORAL SCT 13ML',
             'merek' => 'PT.SRIWIJAYA DISTRIBUSINDO',
+            'kategori' => 'Pembersih',
             'stock_dus' => 1,
             'stock_rcg' => 24,
             'stock_pcs' => 288,
@@ -175,6 +187,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'ROYALE SOFT HIJAB B.VELVET SCT 13ML',
             'merek' => 'PT.SRIWIJAYA DISTRIBUSINDO',
+            'kategori' => 'Pembersih',
             'stock_dus' => 1,
             'stock_rcg' => 24,
             'stock_pcs' => 288,
@@ -186,6 +199,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'ROYALE SOFT RED HOT SUMMER SCT 13ML',
             'merek' => 'PT.SRIWIJAYA DISTRIBUSINDO',
+            'kategori' => 'Pembersih',
             'stock_dus' => 1,
             'stock_rcg' => 24,
             'stock_pcs' => 288,
@@ -197,6 +211,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'FORTUNE PP 1 LTR X 24',
             'merek' => 'CV. MEKAR ABADI',
+            'kategori' => 'Bahan Pokok',
             'stock_dus' => 1,
             'stock_rcg' => 0,
             'stock_pcs' => 24,
@@ -208,6 +223,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'MINYAK KITA SP 1 LT X 12',
             'merek' => 'CV. MEKAR ABADI',
+            'kategori' => 'Bahan Pokok',
             'stock_dus' => 1,
             'stock_rcg' => 0,
             'stock_pcs' => 12,
@@ -219,6 +235,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'FORTUNE RICE PREMIUM @5 KG',
             'merek' => 'CV. MEKAR ABADI',
+            'kategori' => 'Bahan Pokok',
             'stock_dus' => 0,
             'stock_rcg' => 0,
             'stock_pcs' => 1,
@@ -230,6 +247,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'FORTUNE RICE PREMIUM @10 KG',
             'merek' => 'CV. MEKAR ABADI',
+            'kategori' => 'Bahan Pokok',
             'stock_dus' => 0,
             'stock_rcg' => 0,
             'stock_pcs' => 1,
@@ -241,6 +259,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'FORTUNE RICE PREMIUM @ 20 KG',
             'merek' => 'CV. MEKAR ABADI',
+            'kategori' => 'Bahan Pokok',
             'stock_dus' => 0,
             'stock_rcg' => 0,
             'stock_pcs' => 1,
@@ -252,6 +271,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'TEPUNG TULIP 25 KG',
             'merek' => 'CV. MEKAR ABADI',
+            'kategori' => 'Bahan Pokok',
             'stock_dus' => 0,
             'stock_rcg' => 0,
             'stock_pcs' => 1,
@@ -263,6 +283,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'GULA PSM 1 KG X 20',
             'merek' => 'CV. MEKAR ABADI',
+            'kategori' => 'Bahan Pokok',
             'stock_dus' => 1,
             'stock_rcg' => 0,
             'stock_pcs' => 20,
@@ -274,6 +295,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'SUN KARA CUBE 65 ML X 36 PCS',
             'merek' => 'CV. MEKAR ABADI',
+            'kategori' => 'Bahan Pokok',
             'stock_dus' => 1,
             'stock_rcg' => 0,
             'stock_pcs' => 36,
@@ -285,6 +307,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'CASSIE FACIAL 250 GR 2 PLY (1 X 60 PCS)',
             'merek' => 'CV. MEKAR ABADI',
+            'kategori' => 'Kesehatan',
             'stock_dus' => 1,
             'stock_rcg' => 0,
             'stock_pcs' => 60,
@@ -296,6 +319,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'CASSIE FACIAL 1000 GR (1 X 12 PCS)',
             'merek' => 'CV. MEKAR ABADI',
+            'kategori' => 'Kesehatan',
             'stock_dus' => 1,
             'stock_rcg' => 0,
             'stock_pcs' => 12,
@@ -307,6 +331,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'KERUPUK 1000 CRACKERS ORANGE @5KG/BALL',
             'merek' => 'CV. MEKAR ABADI',
+            'kategori' => 'Makanan Kering',
             'stock_dus' => 0,
             'stock_rcg' => 0,
             'stock_pcs' => 1,
@@ -318,6 +343,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'KERUPUK 1000 CRACKERS PUTIH @5KG/BALL',
             'merek' => 'CV. MEKAR ABADI',
+            'kategori' => 'Makanan Kering',
             'stock_dus' => 0,
             'stock_rcg' => 0,
             'stock_pcs' => 1,
@@ -329,6 +355,7 @@ class ItemSeeder extends Seeder
         Item::create([
             'nama' => 'MINYAKKITA PP 1 LT X 12',
             'merek' => 'PT. EVERBRIGHT',
+            'kategori' => 'Bahan Pokok',
             'stock_dus' => 1,
             'stock_rcg' => 0,
             'stock_pcs' => 12,

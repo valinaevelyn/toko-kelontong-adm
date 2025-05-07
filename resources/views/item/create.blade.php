@@ -28,6 +28,13 @@
                 </div>
 
                 <div class="mb-3">
+                    <label for="kategori" class="form-label">Kategori Item</label>
+                    <input type="text" class="form-control @error('kategori') is-invalid @enderror" id="kategori" name="kategori"
+                        value="{{ old('kategori') }}">
+                    @error('kategori')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="mb-3">
                     <label for="harga_jual" class="form-label">Harga Jual</label>
                     <input type="number" class="form-control @error('harga_jual') is-invalid @enderror" id="harga_jual"
                         name="harga_jual" value="{{ old('harga_jual') }}">

@@ -91,7 +91,8 @@
                                                         Pelunasan
                                                     </a></li>
                                             @endif
-                                            @if($pembelian->status == 'LUNAS')
+
+                                            @if($pembelian->status == 'LUNAS' || ($pembelian->status == 'BELUM LUNAS' && $pembelian->metode == 'KREDIT') || $pembelian->metode == 'CEK')
                                                 <li><a class="dropdown-item" href="{{ route('pembelian.faktur', $pembelian->id) }}"
                                                         target="_blank">Cetak Faktur</a></li>
                                             @endif

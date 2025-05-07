@@ -63,8 +63,8 @@ class PembelianController extends Controller
             'items' => 'required|array',
         ]);
 
-        $tanggal = Carbon::now();
-        $prefix = 'F' . $tanggal->format('Ym'); // contoh: F202504
+        $tanggal = Carbon::parse($request->tanggal_pembelian);
+        $prefix = 'F' . $tanggal->format('Ymd'); // contoh: F202504
         $randomCode = strtoupper(Str::random(6)); // contoh: 6 karakter acak
         $noFaktur = $prefix . '-' . $randomCode;
 
@@ -72,7 +72,7 @@ class PembelianController extends Controller
         $pembelian = Pembelian::create([
             'no_faktur' => $noFaktur,
             'nama_supplier' => $request->nama_supplier,
-            'tanggal_pembelian' => now(),
+            'tanggal_pembelian' => $request->tanggal_pembelian,
             'total_harga' => 0, // Akan di-update setelah menambahkan detail
             'total_item' => 0, // Akan di-update setelah menambahkan detail
             'total_uang' => 0,

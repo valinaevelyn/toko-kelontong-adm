@@ -66,8 +66,8 @@ class PenjualanController extends Controller
             'items' => 'required|array',
         ]);
 
-        $tanggal = Carbon::now();
-        $prefix = 'F' . $tanggal->format('Ym'); // contoh: F202504
+        $tanggal = Carbon::parse($request->tanggal_penjualan);
+        $prefix = 'F' . $tanggal->format('Ymd'); // contoh: F202504
         $randomCode = strtoupper(Str::random(6)); // contoh: 6 karakter acak
         $noFaktur = $prefix . '-' . $randomCode;
 
@@ -75,7 +75,7 @@ class PenjualanController extends Controller
         $penjualan = Penjualan::create([
             'no_faktur' => $noFaktur,
             'nama_pembeli' => $request->nama_pembeli,
-            'tanggal_penjualan' => now(),
+            'tanggal_penjualan' => $request->tanggal_penjualan,
             'total_harga_akhir' => 0, // Akan di-update setelah menambahkan detail
             'total_item' => 0, // Akan di-update setelah menambahkan detail
             'total_uang' => 0,

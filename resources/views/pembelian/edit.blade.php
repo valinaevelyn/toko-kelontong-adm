@@ -15,13 +15,13 @@
             <div class="mb-4 mt-4">
                 <label class="form-label">Tanggal Pembelian</label>
                 <input type="date" name="tanggal_pembelian" class="form-control"
-                    value="{{ old('tanggal_pembelian', $pembelian->tanggal_pembelian) }}" required>
+                    value="{{ old('tanggal_pembelian', $pembelian->tanggal_pembelian) }}" disabled>
             </div>
 
             <div class="mb-4 mt-4">
                 <label class="form-label">Nama Supplier</label>
                 <input type="text" name="nama_supplier" class="form-control"
-                    value="{{ old('nama_supplier', $pembelian->nama_supplier) }}" required>
+                    value="{{ old('nama_supplier', $pembelian->nama_supplier) }}" disabled>
             </div>
 
             <h4>Items</h4>

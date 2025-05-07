@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Item;
 use App\Models\Pembelian;
 use App\Models\Penjualan;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -79,6 +80,12 @@ class DashboardController extends Controller
 
         $items_kurang = Item::whereRaw('(stock_dus * dus_in_pcs + stock_rcg * rcg_in_pcs + stock_pcs) < 10')->get();
 
+        $piutangJatuhTempo = Penjualan::whereIn('metode', ['CEK', 'KREDIT', ''])
+            ->whereNull('tanggal_cair')
+            ->where('tanggal_penjualan', '<=', Carbon::now()->subDays(14)) // lebih dari 14 hari
+            ->orderBy('tanggal_penjualan', 'asc')
+            ->get();
+
         return view('index', compact(
             'total_pendapatan',
             'total_pengeluaran',
@@ -87,7 +94,8 @@ class DashboardController extends Controller
             'saldo_bank',
             'transaksi_terbaru',
             'saldo_piutang',
-            'items_kurang'
+            'items_kurang',
+            'piutangJatuhTempo'
         ));
     }
 
