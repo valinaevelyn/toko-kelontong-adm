@@ -44,6 +44,7 @@ class ItemController extends Controller
             'nama' => 'required',
             'merek' => 'required',
             'kategori' => 'required',
+            'minimal_stock' => 'nullable|integer|min:0',
             'harga_jual' => 'required|numeric',
             'stock_dus' => 'nullable|integer',
             'stock_rcg' => 'nullable|integer',
@@ -68,6 +69,7 @@ class ItemController extends Controller
             Item::create([
                 'nama' => $request->input('nama'),
                 'merek' => $request->input('merek'),
+                'minimal_stock' => $request->input('minimal_stock') ?? 0,
                 'kategori' => $request->input('kategori'),
                 'harga_jual' => $request->input('harga_jual'),
                 'stock_dus' => $request->input('stock_dus') ?? 0,
@@ -105,6 +107,7 @@ class ItemController extends Controller
         $rules = [
             'nama' => 'required',
             'merek' => 'required',
+            'minimal_stock' => 'nullable|integer|min:0',
             'kategori' => 'required',
             'harga_jual' => 'required|numeric',
             'stock_dus' => 'nullable|integer|min:0',
@@ -133,6 +136,7 @@ class ItemController extends Controller
         $item->update([
             'nama' => $request->nama,
             'merek' => $request->merek,
+            'minimal_stock' => $request->minimal_stock ?? 0,
             'kategori' => $request->kategori,
             'harga_jual' => $request->harga_jual,
             'stock_dus' => $request->stock_dus ?? 0,

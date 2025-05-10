@@ -78,7 +78,9 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        $items_kurang = Item::whereRaw('(stock_dus * dus_in_pcs + stock_rcg * rcg_in_pcs + stock_pcs) < 10')->get();
+        $items_kurang = Item::select('*')
+            ->where(DB::raw('(stock_dus * dus_in_pcs + stock_rcg * rcg_in_pcs + stock_pcs)'), '<', DB::raw('minimal_stock'))
+            ->get();
 
         $piutangJatuhTempo = Penjualan::whereIn('metode', ['CEK', 'KREDIT', ''])
             ->whereNull('tanggal_cair')

@@ -21,8 +21,10 @@
                     </form>
                 </div>
 
-                <div class="d-flex col justify-content-end">
-                    <a href="{{ route('item.create') }}" class="btn btn-success">Tambah Item</a>
+                <div class="col">
+                    <div class=" d-flex justify-content-end">
+                        <a href="{{ route('item.create') }}" class="btn btn-success">Tambah Item</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -33,6 +35,8 @@
                     <tr>
                         <th scope="col" class="text-center">Nama</th>
                         <th scope="col" class="text-center">Merk</th>
+                        {{-- <th scope="col">UOM</th> --}}
+                        <th scope="col">Minimal Stock</th>
                         <th scope="col" class="text-center">Kategori</th>
                         {{-- <th scope="col">UOM</th> --}}
                         <th scope="col" class="text-center">Harga Jual</th>
@@ -47,6 +51,7 @@
                             <tr class="table align-middle">
                                 <td>{{ $item->nama }}</td>
                                 <td>{{ $item->merek }}</td>
+                                <td>{{ $item->minimal_stock }}</td>
                                 <td>{{ $item->kategori }}</td>
                                 {{-- <td>{{ $item->uom }}</td> --}}
                                 {{-- <td>{{ $item->uom }}</td> --}}

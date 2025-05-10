@@ -28,6 +28,13 @@
                 </div>
 
                 <div class="mb-3">
+                    <label for="minimal_stock" class="form-label">Minimal Stock</label>
+                    <input type="number" class="form-control @error('minimal_stock') is-invalid @enderror" id="minimal_stock" name="minimal_stock"
+                        value="{{ old('minimal_stock') }}">
+                    @error('minimal_stock')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="mb-3">
                     <label for="kategori" class="form-label">Kategori Item</label>
                     <input type="text" class="form-control @error('kategori') is-invalid @enderror" id="kategori" name="kategori"
                         value="{{ old('kategori') }}">

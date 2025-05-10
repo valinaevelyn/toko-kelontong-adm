@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string('kategori');
             // $table->string('uom');
             $table->integer('harga_jual');
+            $table->integer("minimal_stock")->nullable()->default(0);
             // $table->integer('harga_beli');
             // $table->integer('stock');
 

@@ -197,7 +197,7 @@
                     <th>Nama Barang</th>
                     <th>Merek</th>
                     <th>Stok Tersedia (pcs)</th>
-                    <th>Minimal Stok</th>
+                    <th>Minimal Stok (pcs)</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -210,9 +210,11 @@
                         <td>{{ $item->nama }}</td>
                         <td>{{ $item->merek }}</td>
                         <td>{{ $stok_pcs }} pcs</td>
-                        <td>10 pcs</td>
+                        <td>{{ $item->minimal_stock }}</td>
                         <td>
-                            @if($stok_pcs <= 5)
+                            @if($stok_pcs == 0)
+                                <span class="badge bg-dark text-warning">Habis</span>
+                            @elseif($stok_pcs <= $item->minimal_stock)
                                 <span class="badge bg-danger">Sangat Menipis</span>
                             @else
                                 <span class="badge bg-warning text-dark">Perlu Restock</span>
@@ -249,7 +251,9 @@
                                 @php
                                     $tanggalPenjualan = \Carbon\Carbon::parse($piutang->tanggal_penjualan);
                                     $jatuhTempo = $tanggalPenjualan->copy()->addDays(14);
-                                    $terlambat = now()->diffInDays($jatuhTempo);
+                                    $terlambat = abs(round(now()->diffInDays($jatuhTempo)));
+
+                                    $selisih = now()->diffInDays($jatuhTempo);
                                 @endphp
                                 <tr>
                                     <td>{{ $tanggalPenjualan->format('d-m-Y') }}</td>

@@ -7,6 +7,7 @@ use App\Models\LaporanUtang;
 use App\Models\Pembelian;
 use App\Models\PembelianDetail;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Str;
@@ -64,9 +65,22 @@ class PembelianController extends Controller
         ]);
 
         $tanggal = Carbon::parse($request->tanggal_pembelian);
-        $prefix = 'F' . $tanggal->format('Ymd'); // contoh: F202504
-        $randomCode = strtoupper(Str::random(6)); // contoh: 6 karakter acak
-        $noFaktur = $prefix . '-' . $randomCode;
+        $prefix = $tanggal->format('Ymd'); // contoh: F202504
+        // $randomCode = strtoupper(Str::random(6)); // contoh: 6 karakter acak
+        // $noFaktur = $prefix . '-' . $randomCode;
+
+        $countToday = DB::table('pembelians') // sesuaikan nama tabelmu
+            ->whereDate('tanggal_pembelian', $tanggal)
+            ->count();
+
+        // Nomor urut +1
+        $nextNumber = $countToday + 1;
+
+        // Format NN ke 2 digit, misal 1 -> 01, 2 -> 02
+        $numberFormatted = str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
+
+        // Gabungkan
+        $noFaktur = $prefix . $numberFormatted;
 
         // Buat transaksi pembelian
         $pembelian = Pembelian::create([
